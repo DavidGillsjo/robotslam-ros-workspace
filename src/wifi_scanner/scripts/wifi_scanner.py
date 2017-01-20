@@ -40,7 +40,6 @@ class WifiScanner:
         n = 2.1 # Some constant
         return math.pow(10, (txPower - rssi) / (10.0 * n));
 
-
     def scan_callback(self, ssid, bssid, rssi):
         scale_factor = self.rssid_to_distance(rssi)
         print("SSID: %s; Distance: %fm; RSSI = %s" % (ssid, scale_factor, rssi))
