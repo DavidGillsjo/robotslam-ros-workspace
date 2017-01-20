@@ -13,13 +13,47 @@ from scapy.all import *
 
 class WifiScanner:
     def __init__(self):
+        self.x = 0
+        self.y = 0
+        self.z = 0
+        self.t = 0
         self.pub_data = rospy.Publisher('wifi_scanner/data', PointStamped, queue_size=10)
         self.pub_visualization = rospy.Publisher('wifi_scanner/visualization', Marker, queue_size=10)
         self.sniffer = Sniffer("mon0")
         rospy.init_node('wifi_scanner')
 
+    def string_to_color(self, str):
+        hash = str.__hash__()
+        r = ((hash & 0xFF0000) >> 16) / 255.0
+        g = ((hash & 0x00FF00) >> 8) / 255.0
+        b = (hash & 0x0000FF) / 255.0
+        return r, g, b
+
+    def bssid_to_int32(self, bssid):
+        return bssid.__hash__() & (2**31 - 1)
+
+    def rssid_to_distance(self, rssi):
+        # RSSI = TxPower - 10 * n * lg(d)
+        # n = 2 (in free space)
+        # d = 10 ^ ((TxPower - RSSI) / (10 * n))
+        txPower = -40 # RSSI at 1m distance
+        n = 2.1 # Some constant
+        return math.pow(10, (txPower - rssi) / (10.0 * n));
+
+
     def scan_callback(self, ssid, bssid, rssi):
-        print("SSID: %s with BSSID: %s has RSSI = %s" % (ssid, bssid, rssi))
+        scale_factor = self.rssid_to_distance(rssi)
+        print("SSID: %s; Distance: %fm; RSSI = %s" % (ssid, scale_factor, rssi))
+        header = Header(seq = self.t, frame_id = "map")
+        point = Point(x = self.x, y = self.y, z = self.z)
+        orientation = Quaternion(x = 0, y = 0, z = 0, w = 0)
+        pose = Pose(position = point, orientation = orientation)
+        scale = Vector3(1 * scale_factor, 1 * scale_factor, 1 * scale_factor)
+        r, g, b = self.string_to_color(bssid)
+        color = ColorRGBA(r = r, g = g, b = b, a = 0.25)
+        marker = Marker(header = header, type = Marker.SPHERE, id = self.bssid_to_int32(bssid), pose = pose, action = 0, scale = scale, color = color)
+        self.pub_visualization.publish(marker)
+        self.t += 1
 
     def scan(self):
         self.sniffer.start(self.scan_callback)
@@ -53,6 +87,7 @@ class WifiScanner:
 if __name__ == '__main__':
     try:
         wifi_scanner = WifiScanner()
+        wifi_scanner.__init__()
         wifi_scanner.scan()
     except rospy.ROSInterruptException:
         pass
