@@ -13,16 +13,27 @@ class Sniffer:
             "b24":"B", "b25":"B", "b26":"B", "b27":"B", "b28":"B", "b29":"B",
             "b30":"B", "Ext":"B"}
         self.interface = interface
+        self.running = False
+
+    def should_exit(self, pkt):
+        return self.running == False
 
     # callback(SSID, BSSID, RSSI)
     def start(self, callback):
+        self.running = True
         def sniff_callback(pkt):
             if pkt.haslayer(Dot11) and pkt.type == 0:
                 addr, rssi = self.parsePacket(pkt)
-                if addr is not None and rssi is not None and pkt.info is not "":
-                    callback(pkt.info, addr, rssi)
+                try:
+                    if addr is not None and rssi is not None and pkt.info is not None and pkt.info is not "":
+                        callback(pkt.info, addr, rssi)
+                except AttributeError:
+                    print 'Weird attribute error'
 
-        sniff(iface = self.interface, prn = sniff_callback)
+        sniff(iface = self.interface, prn = sniff_callback, stop_filter = self.should_exit)
+
+    def stop(self):
+        self.running = False
 
     def parsePacket(self, pkt):
         if pkt.addr2 is not None:
