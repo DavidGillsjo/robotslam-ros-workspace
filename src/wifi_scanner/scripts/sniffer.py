@@ -27,11 +27,11 @@ class Sniffer:
                 addr, rssi = self.parsePacket(pkt)
                 try:
                     if addr is not None and rssi is not None and pkt.info is not None and pkt.info is not "":
-                        print "%d,%s,%s,%s" % (int(time.time()), pkt.info, addr, rssi)
+                        #print "%d,%s,%s,%s" % (int(time.time()), pkt.info, addr, rssi)
                         callback(pkt.info, addr, rssi)
                 except AttributeError:
-                    pass
-                    #print 'Weird attribute error'
+                    #pass
+                    print 'Weird attribute error'
 
         sniff(iface = self.interface, prn = sniff_callback, stop_filter = self.should_exit)
 
