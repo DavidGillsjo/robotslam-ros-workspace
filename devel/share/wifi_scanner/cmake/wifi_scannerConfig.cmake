@@ -91,9 +91,9 @@ endif()
 # flag project as catkin-based to distinguish if a find_package()-ed project is a catkin project
 set(wifi_scanner_FOUND_CATKIN_PROJECT TRUE)
 
-if(NOT " " STREQUAL " ")
+if(NOT "/home/andreas/Workspaces/ros-workspace/devel/include " STREQUAL " ")
   set(wifi_scanner_INCLUDE_DIRS "")
-  set(_include_dirs "")
+  set(_include_dirs "/home/andreas/Workspaces/ros-workspace/devel/include")
   foreach(idir ${_include_dirs})
     if(IS_ABSOLUTE ${idir} AND IS_DIRECTORY ${idir})
       set(include ${idir})
@@ -122,7 +122,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/andreas/Workspaces/ros-workspace/devel/lib;/opt/ros/kinetic/lib)
+    foreach(path /home/andreas/Workspaces/ros-workspace/devel/lib;/home/andreas/Workspaces/ros-workspace/devel/lib;/opt/ros/kinetic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
@@ -145,7 +145,7 @@ foreach(library ${libraries})
   endif()
 endforeach()
 
-set(wifi_scanner_EXPORTED_TARGETS "")
+set(wifi_scanner_EXPORTED_TARGETS "wifi_scanner_generate_messages_cpp;wifi_scanner_generate_messages_eus;wifi_scanner_generate_messages_lisp;wifi_scanner_generate_messages_nodejs;wifi_scanner_generate_messages_py")
 # create dummy targets for exported code generation targets to make life of users easier
 foreach(t ${wifi_scanner_EXPORTED_TARGETS})
   if(NOT TARGET ${t})
@@ -153,7 +153,7 @@ foreach(t ${wifi_scanner_EXPORTED_TARGETS})
   endif()
 endforeach()
 
-set(depends "")
+set(depends "rospy;std_msgs;message_runtime")
 foreach(depend ${depends})
   string(REPLACE " " ";" depend_list ${depend})
   # the package name of the dependency must be kept in a unique variable so that it is not overwritten in recursive calls
@@ -182,7 +182,7 @@ foreach(depend ${depends})
   list(APPEND wifi_scanner_EXPORTED_TARGETS ${${wifi_scanner_dep}_EXPORTED_TARGETS})
 endforeach()
 
-set(pkg_cfg_extras "")
+set(pkg_cfg_extras "wifi_scanner-msg-extras.cmake")
 foreach(extra ${pkg_cfg_extras})
   if(NOT IS_ABSOLUTE ${extra})
     set(extra ${wifi_scanner_DIR}/${extra})
