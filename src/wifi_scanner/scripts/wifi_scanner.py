@@ -84,10 +84,10 @@ class WifiScanner:
                 except ExtrapolationException as e:
                     #pass
                     if errors == 50:
-                        print 'Failed to get position.'
+                        #print 'Failed to get position.'
                         raise e
                     else:
-                        print 'Could not get position, retrying...'
+                        #print 'Could not get position, retrying...'
                         errors += 1
             #x = 2 * math.cos(t)
             #y = 2 * math.sin(t)
