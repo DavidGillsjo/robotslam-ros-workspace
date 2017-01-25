@@ -30,8 +30,8 @@ class Sniffer:
                         #print "%d,%s,%s,%s" % (int(time.time()), pkt.info, addr, rssi)
                         callback(pkt.info, addr, rssi)
                 except AttributeError:
-                    #pass
-                    print 'Weird attribute error'
+                    pass
+                    #print 'Weird attribute error'
 
         sniff(iface = self.interface, prn = sniff_callback, stop_filter = self.should_exit)
 

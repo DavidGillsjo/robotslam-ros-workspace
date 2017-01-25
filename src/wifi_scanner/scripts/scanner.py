@@ -5,6 +5,7 @@ import time
 import math
 import pprint
 import threading
+from wifi_scanner.msg import WifiMeasurement
 from sniffer import Sniffer
 from tf import (TransformListener, ExtrapolationException)
 from std_msgs.msg import (Header, ColorRGBA)
@@ -21,10 +22,13 @@ class WifiScanner:
         self.t = 0
         rospy.init_node('wifi_scanner')
         self.tf = TransformListener()
-        self.pub_data = rospy.Publisher('wifi_scanner/data', PointStamped, queue_size=10)
+        self.pub_data = rospy.Publisher('wifi_scanner/data', WifiMeasurement, queue_size=10)
+        self.pub_data_filtered = rospy.Publisher('wifi_scanner/data_filtered', WifiMeasurement, queue_size=10)
         self.pub_visualization = rospy.Publisher('wifi_scanner/visualization', Marker, queue_size=10)
         self.sniffer = Sniffer("mon0")
         self.threads = []
+        self.prev_rssis = {}
+        self.alpha = 0.25
 
     def string_to_color(self, str):
         hash = str.__hash__()
@@ -45,6 +49,19 @@ class WifiScanner:
         return math.pow(10, (txPower - rssi) / (10.0 * n));
 
     def scan_callback(self, ssid, bssid, rssi):
+        # Data publish
+        measurement = WifiMeasurement(ssid = ssid, bssid = bssid, rssi = rssi, stamp = rospy.Time.now())
+        self.pub_data.publish(measurement)
+
+        # Filtered data publish
+        if bssid not in self.prev_rssis:
+            self.prev_rssis[bssid] = rssi
+        filtered_rssi = self.prev_rssis[bssid] + self.alpha * (rssi - self.prev_rssis[bssid])
+        self.prev_rssis[bssid] = filtered_rssi
+        measurement = WifiMeasurement(ssid = ssid, bssid = bssid, rssi = filtered_rssi, stamp = rospy.Time.now())
+        self.pub_data_filtered.publish(measurement)
+
+        # ROS visualization
         scale_factor = self.rssid_to_distance(rssi)
         #print("SSID: %s; Distance: %fm; RSSI = %s" % (ssid, scale_factor, rssi))
         header = Header(seq = self.t, frame_id = "map")
@@ -63,24 +80,17 @@ class WifiScanner:
         t = threading.Thread(target=self.sniffer.start, args=(self.scan_callback,))
         self.threads.append(t)
         t.start()
-        #self.sniffer.start(self.scan_callback)
         print 'Starting position caching'
         rate = rospy.Rate(10) # 10hz
-        #sphere_id = 1
-        #t = 0
-        #rospy.spin()
         errors = 0
         while not rospy.is_shutdown():
             if self.tf.frameExists("/base_link") and self.tf.frameExists("/map"):
                 try:
-                #self.tf.waitForTransform("/base_link", "/map", rospy.Time.now(), rospy.Duration(10.0))
                     t = self.tf.getLatestCommonTime("/map", "/base_link")
-                    #t = rospy.Time(0)
                     (pos_x, pos_y, pos_z), quaternion = self.tf.lookupTransform("/map", "/base_link", t)
                     self.x = pos_x
                     self.y = pos_y
                     self.z = pos_z
-                    #print x, quaternion
                 except ExtrapolationException as e:
                     #pass
                     if errors == 50:
@@ -89,27 +99,6 @@ class WifiScanner:
                     else:
                         #print 'Could not get position, retrying...'
                         errors += 1
-            #x = 2 * math.cos(t)
-            #y = 2 * math.sin(t)
-            #z = 0
-            #hello_str = "scan: %f %f %f" % (x, y, z)
-            #rospy.loginfo(hello_str)
-            # header = Header(seq = t, frame_id = "map")
-
-            # Publish actual point
-            #point = Point(x = x, y = y, z = z)
-            #pointStamped = PointStamped(header = header, point = point)
-            #pub_data.publish(pointStamped)
-
-            # Publish visulization point
-            # orientation = Quaternion(x = 0, y = 0, z = 0, w = 0)
-            # pose = Pose(position = point, orientation = orientation)
-            # scale = Vector3(1, 1, 1)
-            # color = ColorRGBA(r = 0, g = 1, b = 0, a = 0.5)
-            # marker = Marker(header = header, type = Marker.SPHERE, id = sphere_id, pose = pose, action = 0, scale = scale, color = color)
-            # pub_visualization.publish(marker)
-
-            #t += math.pi / 12
             rate.sleep()
 
     def stop(self):
