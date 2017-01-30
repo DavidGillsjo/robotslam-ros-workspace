@@ -1,0 +1,9 @@
+<!-- /opt/ros/kinetic/share/turtlebot_gazebo/launch/gmapping_demo.launch -->
+<launch>
+  <arg name="3d_sensor" default="$(env TURTLEBOT_3D_SENSOR)"/>  <!-- r200, kinect, asus_xtion_pro -->
+  <arg name="custom_gmapping_launch_file" default="$(find robotslam_launcher)/launch/includes/gmapping/gmapping.launch.xml"/>
+  <arg name="scan_topic" value="/hokuyo_scan"/>
+  <!--<include file="$(arg custom_gmapping_launch_file)"/>-->
+  <include file="$(find hector_mapping)/launch/mapping_default.launch"/>
+</launch>
+
