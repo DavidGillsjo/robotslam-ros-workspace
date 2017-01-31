@@ -1,0 +1,18 @@
+# local planner - default is trajectory rollout
+base_local_planner: "dwa_local_planner/DWAPlannerROS"
+
+#base_global_planner: "navfn/NavfnROS"
+base_global_planner: "global_planner/GlobalPlanner"
+#base_global_planner: "carrot_planner/CarrotPlanner"
+
+obstacle_layer:
+  track_unknown_space: true
+
+global_costmap:
+  static_map: true
+
+NavfnROS:
+  allow_unknown: true
+
+GlobalPlanner:  
+  allow_unknown: true

@@ -1,3 +1,9 @@
 <launch>
-  <include file="$(find turtlebot_navigation)/launch/includes/move_base.launch.xml"/>
+  <!--
+  <param name="navfn/allow_unknown" value="true"/>
+  <param name="navfn/track_unknown_space" value="false"/>
+  -->
+  <include file="$(find turtlebot_navigation)/launch/includes/move_base.launch.xml">
+    <arg name="custom_param_file" value="$(find robotslam_launcher)/param/costmap_params.yaml"/>
+  </include>
 </launch>

@@ -18,9 +18,10 @@
     <remap from="imu_out" to="/imu" />
   </node>
 
-  <node name="rviz" pkg="rviz" type="rviz" required="true"
+  <!--<node name="rviz" pkg="rviz" type="rviz" required="true"
       args="-d $(find robotslam_launcher
-          )/configs/demo_turtlebot_cartographer.rviz"/>
+          )/configs/demo_turtlebot_cartographer.rviz"/>-->
+  <include file="$(find turtlebot_rviz_launchers)/launch/view_navigation.launch"/>
 
   <include file="$(find robotslam_launcher)/launch/includes/planner.launch"/>
 </launch>
