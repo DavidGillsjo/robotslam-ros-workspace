@@ -1,6 +1,5 @@
 <launch>
-  <include file="$(find robotslam_launcher)/launch/office_gezebo.launch"></include>
-  <include file="$(find robotslam_launcher)/launch/gazebo_gmapping_demo.launch">
-  </include>
+  <include file="$(find robotslam_launcher)/launch/office_gezebo.launch"/>
+  <include file="$(find robotslam_launcher)/launch/gazebo_gmapping_demo.launch"/>
   <include file="$(find turtlebot_rviz_launchers)/launch/view_navigation.launch"/>
 </launch>

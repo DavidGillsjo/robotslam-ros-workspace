@@ -1,7 +1,5 @@
 <launch>
-  <include file="$(find turtlebot_gazebo)/launch/turtlebot_world.launch">
-    <arg name="world_file" default="worlds/willowgarage.world"/>
-  </include>
+  <include file="$(find robotslam_launcher)/launch/office_gezebo.launch"/>
   <include file="$(find hector_mapping)/launch/mapping_default.launch">
   	<arg name="odom_frame" value="odom"/>
   </include>
