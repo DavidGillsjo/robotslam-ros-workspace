@@ -19,6 +19,6 @@
   </node>
 
   <node name="rviz" pkg="rviz" type="rviz" required="true"
-      args="-d $(find cartographer_turtlebot
-          )/configuration_files/demo_turtlebot.rviz"/>
+      args="-d $(find robotslam_launcher
+          )/configs/demo_turtlebot_cartographer.rviz"/>
 </launch>
