@@ -6,7 +6,7 @@
   <node name="cartographer_node" pkg="cartographer_ros"
       type="cartographer_node" args="
           -configuration_directory
-              $(find cartographer_turtlebot)/configuration_files
+              $(find robotslam_launcher)/configs
           -configuration_basename turtlebot_urg_lidar_2d.lua"
       output="screen">
     <remap from="laser_scan" to="scan" />
