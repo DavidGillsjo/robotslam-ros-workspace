@@ -1,7 +1,7 @@
 <launch>
   <param name="/use_sim_time" value="true" />
 
-  <include file="$(find robotslam_launcher)/launch/office_gezebo.launch"/>
+  <include file="$(find robotslam_launcher)/launch/office_gazebo.launch"/>
 
   <node name="cartographer_node" pkg="cartographer_ros"
       type="cartographer_node" args="
@@ -21,4 +21,6 @@
   <node name="rviz" pkg="rviz" type="rviz" required="true"
       args="-d $(find robotslam_launcher
           )/configs/demo_turtlebot_cartographer.rviz"/>
+
+  <include file="$(find robotslam_launcher)/launch/includes/planner.launch"/>
 </launch>
