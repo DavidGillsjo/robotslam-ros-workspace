@@ -1,5 +1,22 @@
 # ros-workspace
 
+## Things you might need
+Install stuff
+```sudo apt-get install python-wstool python-rosdep ninja-build```
+
+Run stuff
+```wstool update -t src```
+```bash
+# Install deb dependencies.
+rosdep init
+rosdep update
+rosdep install --from-paths src --ignore-src --rosdistro=${ROS_DISTRO} -y
+
+# Build and install.
+catkin_make_isolated --install --use-ninja
+source install_isolated/setup.bash
+```
+
 ## TurtleBot Office Mapping
 
 We start by bringing up the map.
