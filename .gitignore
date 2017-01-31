@@ -47,3 +47,11 @@ qtcreator-*
 CATKIN_IGNORE
 
 .idea
+
+build_isolated/
+
+devel/
+
+devel_isolated/
+
+install_isolated/
