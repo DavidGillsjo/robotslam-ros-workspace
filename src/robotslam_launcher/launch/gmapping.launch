@@ -1,0 +1,6 @@
+<launch>
+  <node pkg="tf" type="static_transform_publisher" name="base_to_scan_broadcaster" args="0 0 0 0 0 0 base_link laser 100" />
+  <include file="$(find robotslam_launcher)/launch/includes/gmapping_demo.launch"/>
+  <include file="$(find turtlebot_rviz_launchers)/launch/view_navigation.launch"/>
+  <include file="$(find robotslam_launcher)/launch/includes/planner.launch"/>
+</launch>
