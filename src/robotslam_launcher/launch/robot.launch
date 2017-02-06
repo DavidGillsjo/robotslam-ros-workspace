@@ -1,0 +1,4 @@
+<launch>
+  <include file="$(find robotslam_launcher)/launch/includes/rplidar.launch"/>
+  <include file="$(find robotslam_launcher)/launch/includes/bringup.launch"/>
+</launch>
