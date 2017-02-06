@@ -20,13 +20,13 @@ class Walker:
         self.seq = 0
 
         # Sleep, since publishing seems to fail otherwise
-        rospy.sleep(1)
+        rospy.sleep(2)
 
     def move(self):
         self.seq += 1
 
 
-        header = Header(frame_id='odom')
+        header = Header(frame_id='base_link')
 
         point = Point(x=1, y=0)
         orientation = Quaternion(x=0, y=0, z=0, w=1)
@@ -34,13 +34,13 @@ class Walker:
         rospy.loginfo(PoseStamped(header=header, pose=pose))
         self.pub.publish(PoseStamped(header=header, pose=pose))
 
-        rospy.sleep(5)
+        #rospy.sleep(5)
 
-        point = Point(x=-1, y=0)
-        orientation = Quaternion(x=0, y=0, z=0, w=1)
-        pose = Pose(position=point, orientation=orientation)
-        rospy.loginfo(PoseStamped(header=header, pose=pose))
-        self.pub.publish(PoseStamped(header=header, pose=pose))
+        #point = Point(x=-1, y=0)
+        #orientation = Quaternion(x=0, y=0, z=0, w=1)
+        #pose = Pose(position=point, orientation=orientation)
+        #rospy.loginfo(PoseStamped(header=header, pose=pose))
+        #self.pub.publish(PoseStamped(header=header, pose=pose))
 
         # Empty
         return 0
