@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<robot name="sensor_rplidar" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:include filename="$(find turtlebot_description)/urdf/turtlebot_gazebo.urdf.xacro"/>
+  <xacro:include filename="$(find turtlebot_description)/urdf/turtlebot_properties.urdf.xacro"/>
+
+  <xacro:macro name="sensor_rplidar" params="parent name ros_topic">
+    <joint name="${name}_join" type="fixed">
+      <origin xyz="-0.020 0.00 0.040" rpy="0 0 0"/>
+      <parent link="${parent}"/>
+      <child link="${name}_frame"/>
+    </joint>
+
+    <link name="${name}_frame">
+      <visual>
+        <origin xyz="-0.0425 0.035 -0.040" rpy="1.570796327 0 0"/>
+        <geometry>
+          <mesh filename="package://turtlebot_description/meshes/sensors/rplidar_main.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="blue">
+          <color rgba="0 0 .8 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+        <geometry>
+          <box size="0.07271 0.27794 0.073"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="0.564"/>
+        <origin xyz="0 0 0"/>
+        <inertia ixx="0.003881243" ixy="0.0" ixz="0.0"
+                 iyy="0.000498940" iyz="0.0"
+                 izz="0.003879257"/>
+      </inertial>
+    </link>
+
+    <gazebo reference="${name}_frame">
+      <sensor type="ray" name="${name}">
+        <always_on>true</always_on>
+        <update_rate>5.5</update_rate>
+        <pose>0 0 0 0 0 0</pose>
+        <visualize>false</visualize>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>500</samples>
+              <resolution>1</resolution>
+              <min_angle>-3.14</min_angle>
+              <max_angle>3.14</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.25</min>
+            <max>5.5</max>
+            <resolution>0.004</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.004</stddev>
+          </noise>
+        </ray>
+        <plugin name="gazebo_ros_${name}_controller" filename="libgazebo_ros_laser.so">
+          <topicName>${ros_topic}</topicName>
+          <frameName>${name}_frame</frameName>
+        </plugin>
+      </sensor>
+    </gazebo>
+  </xacro:macro>
+</robot>
