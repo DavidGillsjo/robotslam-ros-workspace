@@ -1,6 +1,6 @@
 <launch>
 
-  <include file="$(find robotslam_launcher)/includes/transform.xml"/>
+  <include file="$(find robotslam_launcher)/launch/includes/transform.xml"/>
 
   <node name="cartographer_node" pkg="cartographer_ros"
         type="cartographer_node" args="

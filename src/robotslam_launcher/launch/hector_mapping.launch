@@ -1,5 +1,5 @@
 <launch>
-  <include file="$(find robotslam_launcher)/includes/transform.xml"/>
+  <include file="$(find robotslam_launcher)/launch/includes/transform.xml"/>
 
   <include file="$(find hector_mapping)/launch/mapping_default.launch">
     <arg name="odom_frame" value="odom"/>

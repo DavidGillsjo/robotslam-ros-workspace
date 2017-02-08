@@ -1,5 +1,5 @@
 <launch>
-  <include file="$(find robotslam_launcher)/includes/transform.xml"/>
+  <include file="$(find robotslam_launcher)/launch/includes/transform.xml"/>
 
   <include file="$(find robotslam_launcher)/launch/includes/gmapping_demo.launch.xml"/>
   <include file="$(find turtlebot_rviz_launchers)/launch/view_navigation.launch"/>
