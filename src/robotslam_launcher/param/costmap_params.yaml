@@ -3,14 +3,14 @@ base_local_planner: "dwa_local_planner/DWAPlannerROS"
 #base_local_planner: "teb_local_planner/TebLocalPlannerROS"
 
 #base_global_planner: "navfn/NavfnROS"
-base_global_planner: "global_planner/GlobalPlanner"
-#base_global_planner: "carrot_planner/CarrotPlanner"
+#base_global_planner: "global_planner/GlobalPlanner"
+base_global_planner: "carrot_planner/CarrotPlanner"
 
 #cost_scaling_factor and inflation_radius were now moved to the inflation_layer ns
 inflation_layer:
   enabled:              true
   cost_scaling_factor:  40.0  # exponential rate at which the obstacle cost drops off (default: 10)
-  inflation_radius:     0.55 # max. distance from an obstacle at which costs are incurred for planning paths.
+  inflation_radius:     0.25 # max. distance from an obstacle at which costs are incurred for planning paths.
 
 static_layer:
   unknown_cost_value: 10
@@ -20,10 +20,9 @@ local_costmap:
    robot_base_frame: /base_link
    update_frequency: 5.0
    publish_frequency: 1.0
-   static_map: true
+   static_map: false
    rolling_window: true
    plugins:
-     - {name: static_layer,            type: "costmap_2d::StaticLayer"}
      - {name: obstacle_layer,      type: "costmap_2d::VoxelLayer"}
      - {name: inflation_layer,     type: "costmap_2d::InflationLayer"}
 

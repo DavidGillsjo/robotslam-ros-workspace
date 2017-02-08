@@ -1,12 +1,10 @@
 <launch>
-  <!--<param name="/use_sim_time" value="true" />-->
 
-  <node pkg="tf" type="static_transform_publisher" name="base_to_scan_broadcaster"
-        args="0 0 0 0 0 0 base_link laser 100"/>
+  <include file="$(find robotslam_launcher)/includes/transform.xml"/>
 
-    <!-- Map server -->
+  <!-- Map server -->
   <arg name="map_file" default="$(env TURTLEBOT_MAP_FILE)"/>
-  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)"/>
 
   <!-- AMCL -->
   <arg name="custom_amcl_launch_file" default="$(find robotslam_launcher)/launch/includes/amcl/amcl.launch.xml"/>
