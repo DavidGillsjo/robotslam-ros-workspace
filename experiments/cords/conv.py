@@ -1,13 +1,15 @@
+import json
+from pprint import pprint
 from affine import Affine
 
-# Local cordinates
-gps_points_local = [[0.0, 0.0], [1.0, 1.0]]
+with open('config.json') as data:
+    config = json.load(data)
 
-# GPS reference points
-gps_points_geo = [[55.708955, 13.210666], [55.709067, 13.210856]]
+print('Config:')
+pprint(config)
 
 # Create the transformation matrix
-transform = Affine.from_tiepoints(gps_points_local,gps_points_geo)
+transform = Affine.from_tiepoints(config['local_points'], config['reference_points'])
 
 print('Transformation Matrix:')
 print(transform.trans_matrix)
