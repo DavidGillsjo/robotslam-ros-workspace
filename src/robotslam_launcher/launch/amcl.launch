@@ -1,5 +1,5 @@
 <launch>
-
+  <arg name="scan_topic" default="laser_filtered"/>
   <include file="$(find robotslam_launcher)/launch/includes/transform.xml"/>
 
   <!-- Map server -->

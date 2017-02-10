@@ -1,5 +1,5 @@
 <launch>
-
+  <arg name="scan_topic" default="laser_filtered"/>
   <include file="$(find robotslam_launcher)/launch/includes/transform.xml"/>
 
   <node name="cartographer_node" pkg="cartographer_ros"
@@ -8,7 +8,7 @@
               $(find robotslam_launcher)/configs
           -configuration_basename turtlebot_urg_lidar_2d.lua"
         output="screen">
-    <remap from="laser_scan" to="scan"/>
+    <remap from="laser_scan" to="$(arg scan_topic)"/>
   </node>
 
   <node name="flat_world_imu_node" pkg="cartographer_turtlebot"
