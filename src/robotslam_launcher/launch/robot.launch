@@ -1,4 +1,7 @@
 <launch>
   <include file="$(find robotslam_launcher)/launch/includes/rplidar.launch.xml"/>
+  <include file="$(find turtlebot_bringup)/launch/3dsensor.launch">
+    <arg name="scan_topic" value="scan_camera"/>
+  </include>
   <include file="$(find robotslam_launcher)/launch/includes/bringup.launch.xml"/>
 </launch>
