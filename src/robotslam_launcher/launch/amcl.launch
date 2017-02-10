@@ -1,6 +1,8 @@
 <launch>
   <arg name="scan_topic" default="laser_filtered"/>
+
   <include file="$(find robotslam_launcher)/launch/includes/transform.xml"/>
+  <node name="laser_filter" pkg="turtlebot_navigation" type="laser_footprint_filter"/>
 
   <!-- Map server -->
   <arg name="map_file" default="$(env TURTLEBOT_MAP_FILE)"/>
