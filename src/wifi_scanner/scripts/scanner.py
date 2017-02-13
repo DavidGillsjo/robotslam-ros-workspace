@@ -101,6 +101,7 @@ class WifiScanner:
                         #print 'Could not get position, retrying...'
                         errors += 1
             rate.sleep()
+        self.stop()
 
     def stop(self):
         self.sniffer.stop()

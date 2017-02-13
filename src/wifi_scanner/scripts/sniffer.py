@@ -23,7 +23,7 @@ class Sniffer:
     def start(self, callback):
         self.running = True
         def sniff_callback(pkt):
-            if pkt.haslayer(Dot11) and pkt.type == 0:
+            if pkt.haslayer(Dot11) and pkt.type == 0 and pkt.subtype == 8:
                 addr, rssi = self.parsePacket(pkt)
                 try:
                     if addr is not None and rssi is not None and pkt.info is not None and pkt.info is not "":
