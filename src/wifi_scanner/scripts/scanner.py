@@ -5,9 +5,10 @@ import time
 import math
 import pprint
 import threading
-from wifi_scanner.msg import WifiMeasurement
+import tf
+from wifi_scanner.msg import (WifiMeasurement, WifiMeasurementArray)
 from sniffer import Sniffer
-from tf import (TransformListener, ExtrapolationException)
+from tf import (TransformListener, ExtrapolationException, Exception)
 from std_msgs.msg import (Header, ColorRGBA)
 from geometry_msgs.msg import (Point, PointStamped, Pose, Quaternion, Vector3)
 from visualization_msgs.msg import Marker
@@ -24,10 +25,12 @@ class WifiScanner:
         self.tf = TransformListener()
         self.pub_data = rospy.Publisher('wifi_scanner/data', WifiMeasurement, queue_size=10)
         self.pub_data_filtered = rospy.Publisher('wifi_scanner/data_filtered', WifiMeasurement, queue_size=10)
+        self.pub_data_filtered_array = rospy.Publisher('wifi_scanner/data_filtered_array', WifiMeasurementArray, queue_size=10)
         self.pub_visualization = rospy.Publisher('wifi_scanner/visualization', Marker, queue_size=10)
         self.sniffer = Sniffer("mon0")
         self.threads = []
         self.prev_rssis = {}
+        self.stored_measurements= {} # don't hate me plzzz
         self.alpha = 0.25
 
     def string_to_color(self, str):
@@ -49,8 +52,10 @@ class WifiScanner:
         return math.pow(10, (txPower - rssi) / (10.0 * n));
 
     def scan_callback(self, ssid, bssid, rssi):
+        point = Point(x = self.x, y = self.y, z = self.z)
+
         # Data publish
-        measurement = WifiMeasurement(ssid = ssid, bssid = bssid, rssi = rssi, stamp = rospy.Time.now())
+        measurement = WifiMeasurement(ssid = ssid, bssid = bssid, rssi = rssi, position = point, stamp = rospy.Time.now())
         self.pub_data.publish(measurement)
 
         # Filtered data publish
@@ -58,14 +63,16 @@ class WifiScanner:
             self.prev_rssis[bssid] = rssi
         filtered_rssi = self.prev_rssis[bssid] + self.alpha * (rssi - self.prev_rssis[bssid])
         self.prev_rssis[bssid] = filtered_rssi
-        measurement = WifiMeasurement(ssid = ssid, bssid = bssid, rssi = filtered_rssi, stamp = rospy.Time.now())
+        measurement = WifiMeasurement(ssid = ssid, bssid = bssid, rssi = filtered_rssi, position = point, stamp = rospy.Time.now())
         self.pub_data_filtered.publish(measurement)
+
+        # Store last measurement (filtered), only one per bssid
+        self.stored_measurements[bssid] = measurement 
 
         # ROS visualization
         scale_factor = self.rssid_to_distance(rssi)
         #print("SSID: %s; Distance: %fm; RSSI = %s" % (ssid, scale_factor, rssi))
         header = Header(seq = self.t, frame_id = "map")
-        point = Point(x = self.x, y = self.y, z = self.z)
         orientation = Quaternion(x = 0, y = 0, z = 0, w = 0)
         pose = Pose(position = point, orientation = orientation)
         scale = Vector3(1 * scale_factor, 1 * scale_factor, 1 * scale_factor)
@@ -84,22 +91,28 @@ class WifiScanner:
         rate = rospy.Rate(10) # 10hz
         errors = 0
         while not rospy.is_shutdown():
-            if self.tf.frameExists("/base_link") and self.tf.frameExists("/map"):
+            if self.tf.frameExists("/base_footprint") and self.tf.frameExists("/map"):
                 try:
-                    t = self.tf.getLatestCommonTime("/map", "/base_link")
-                    (pos_x, pos_y, pos_z), quaternion = self.tf.lookupTransform("/map", "/base_link", t)
+                    t = self.tf.getLatestCommonTime("/map", "/base_footprint")
+                    (pos_x, pos_y, pos_z), quaternion = self.tf.lookupTransform("/map", "/base_footprint", t)
                     self.x = pos_x
                     self.y = pos_y
                     self.z = pos_z
-                except ExtrapolationException as e:
+                except tf.Exception as e:
                     #pass
                     if errors == 50:
-                        #print 'Failed to get position.'
+                        print 'Failed to get position.'
+                        self.stop()
                         raise e
                     else:
-                        #print 'Could not get position, retrying...'
+                        print 'Could not get position, retrying...'
                         errors += 1
+
+            # publish stored measurements
+            self.pub_data_filtered_array.publish(self.stored_measurements.values())
+            self.stored_measurements.clear()
             rate.sleep()
+        self.stop()
 
     def stop(self):
         self.sniffer.stop()
