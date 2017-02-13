@@ -6,7 +6,7 @@ import math
 import pprint
 import threading
 import tf
-from wifi_scanner.msg import WifiMeasurement
+from wifi_scanner.msg import (WifiMeasurement, WifiMeasurementArray)
 from sniffer import Sniffer
 from tf import (TransformListener, ExtrapolationException, Exception)
 from std_msgs.msg import (Header, ColorRGBA)
@@ -25,10 +25,12 @@ class WifiScanner:
         self.tf = TransformListener()
         self.pub_data = rospy.Publisher('wifi_scanner/data', WifiMeasurement, queue_size=10)
         self.pub_data_filtered = rospy.Publisher('wifi_scanner/data_filtered', WifiMeasurement, queue_size=10)
+        self.pub_data_filtered_array = rospy.Publisher('wifi_scanner/data_filtered_array', WifiMeasurementArray, queue_size=10)
         self.pub_visualization = rospy.Publisher('wifi_scanner/visualization', Marker, queue_size=10)
         self.sniffer = Sniffer("mon0")
         self.threads = []
         self.prev_rssis = {}
+        self.stored_measurements= {} # don't hate me plzzz
         self.alpha = 0.25
 
     def string_to_color(self, str):
@@ -63,6 +65,9 @@ class WifiScanner:
         self.prev_rssis[bssid] = filtered_rssi
         measurement = WifiMeasurement(ssid = ssid, bssid = bssid, rssi = filtered_rssi, position = point, stamp = rospy.Time.now())
         self.pub_data_filtered.publish(measurement)
+
+        # Store last measurement (filtered), only one per bssid
+        self.stored_measurements[bssid] = measurement 
 
         # ROS visualization
         scale_factor = self.rssid_to_distance(rssi)
@@ -102,6 +107,10 @@ class WifiScanner:
                     else:
                         print 'Could not get position, retrying...'
                         errors += 1
+
+            # publish stored measurements
+            self.pub_data_filtered_array.publish(self.stored_measurements.values())
+            self.stored_measurements.clear()
             rate.sleep()
         self.stop()
 
