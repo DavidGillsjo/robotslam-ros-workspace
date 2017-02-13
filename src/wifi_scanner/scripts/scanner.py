@@ -5,9 +5,10 @@ import time
 import math
 import pprint
 import threading
+import tf
 from wifi_scanner.msg import WifiMeasurement
 from sniffer import Sniffer
-from tf import (TransformListener, ExtrapolationException)
+from tf import (TransformListener, ExtrapolationException, Exception)
 from std_msgs.msg import (Header, ColorRGBA)
 from geometry_msgs.msg import (Point, PointStamped, Pose, Quaternion, Vector3)
 from visualization_msgs.msg import Marker
@@ -85,20 +86,21 @@ class WifiScanner:
         rate = rospy.Rate(10) # 10hz
         errors = 0
         while not rospy.is_shutdown():
-            if self.tf.frameExists("/base_link") and self.tf.frameExists("/map"):
+            if self.tf.frameExists("/base_footprint") and self.tf.frameExists("/map"):
                 try:
-                    t = self.tf.getLatestCommonTime("/map", "/base_link")
-                    (pos_x, pos_y, pos_z), quaternion = self.tf.lookupTransform("/map", "/base_link", t)
+                    t = self.tf.getLatestCommonTime("/map", "/base_footprint")
+                    (pos_x, pos_y, pos_z), quaternion = self.tf.lookupTransform("/map", "/base_footprint", t)
                     self.x = pos_x
                     self.y = pos_y
                     self.z = pos_z
-                except ExtrapolationException as e:
+                except tf.Exception as e:
                     #pass
                     if errors == 50:
-                        #print 'Failed to get position.'
+                        print 'Failed to get position.'
+                        self.stop()
                         raise e
                     else:
-                        #print 'Could not get position, retrying...'
+                        print 'Could not get position, retrying...'
                         errors += 1
             rate.sleep()
         self.stop()

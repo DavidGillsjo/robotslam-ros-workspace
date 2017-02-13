@@ -154,7 +154,6 @@ include_directories(
 install(PROGRAMS #DIRECTORY scripts
   scripts/scanner.py
   scripts/visualizer.py
-  scripts/logger.py
   scripts/sniffer.py
   scripts/visualizer_data_container.py
   scripts/utils.py
