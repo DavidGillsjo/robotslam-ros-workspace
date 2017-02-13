@@ -37,7 +37,7 @@ class Visualizer(animation.TimedAnimation):
     def callback(self, measurement):
         container = self.containers.get(ssid = measurement.ssid, bssid = measurement.bssid)
         if container.line is None:
-            container.line = Line2D([], [], color = string_to_color(measurement.ssid), label=measurement.ssid)
+            container.line = Line2D([], [], color = string_to_color(measurement.ssid.encode('punycode')), label=measurement.ssid.encode('punycode'))
             container.line.set_data([], [])
             self.ax.add_line(container.line)
         self.containers.get(ssid = measurement.ssid, bssid = measurement.bssid).put(measurement.stamp, measurement.rssi)

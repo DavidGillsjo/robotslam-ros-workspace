@@ -49,8 +49,10 @@ class WifiScanner:
         return math.pow(10, (txPower - rssi) / (10.0 * n));
 
     def scan_callback(self, ssid, bssid, rssi):
+        point = Point(x = self.x, y = self.y, z = self.z)
+
         # Data publish
-        measurement = WifiMeasurement(ssid = ssid, bssid = bssid, rssi = rssi, stamp = rospy.Time.now())
+        measurement = WifiMeasurement(ssid = ssid, bssid = bssid, rssi = rssi, position = point, stamp = rospy.Time.now())
         self.pub_data.publish(measurement)
 
         # Filtered data publish
@@ -58,14 +60,13 @@ class WifiScanner:
             self.prev_rssis[bssid] = rssi
         filtered_rssi = self.prev_rssis[bssid] + self.alpha * (rssi - self.prev_rssis[bssid])
         self.prev_rssis[bssid] = filtered_rssi
-        measurement = WifiMeasurement(ssid = ssid, bssid = bssid, rssi = filtered_rssi, stamp = rospy.Time.now())
+        measurement = WifiMeasurement(ssid = ssid, bssid = bssid, rssi = filtered_rssi, position = point, stamp = rospy.Time.now())
         self.pub_data_filtered.publish(measurement)
 
         # ROS visualization
         scale_factor = self.rssid_to_distance(rssi)
         #print("SSID: %s; Distance: %fm; RSSI = %s" % (ssid, scale_factor, rssi))
         header = Header(seq = self.t, frame_id = "map")
-        point = Point(x = self.x, y = self.y, z = self.z)
         orientation = Quaternion(x = 0, y = 0, z = 0, w = 0)
         pose = Pose(position = point, orientation = orientation)
         scale = Vector3(1 * scale_factor, 1 * scale_factor, 1 * scale_factor)

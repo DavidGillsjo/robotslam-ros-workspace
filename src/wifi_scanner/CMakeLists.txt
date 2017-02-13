@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
+  geometry_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -69,6 +70,7 @@ add_message_files(
 generate_messages(
   DEPENDENCIES
   std_msgs
+  geometry_msgs
 )
 
 ################################################
@@ -147,12 +149,21 @@ include_directories(
 # all install targets should use catkin DESTINATION variables
 # See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
 
-## Mark executable scripts (Python etc.) for installation
-## in contrast to setup.py, you can choose the destination
-# install(PROGRAMS
-#   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+# Mark executable scripts (Python etc.) for installation
+# in contrast to setup.py, you can choose the destination
+install(PROGRAMS #DIRECTORY scripts
+  scripts/scanner.py
+  scripts/visualizer.py
+  scripts/logger.py
+  scripts/sniffer.py
+  scripts/visualizer_data_container.py
+  scripts/utils.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+#install(DIRECTORY scripts
+#  DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}/..
+#)
 
 ## Mark executables and/or libraries for installation
 # install(TARGETS wifi_scanner wifi_scanner_node
