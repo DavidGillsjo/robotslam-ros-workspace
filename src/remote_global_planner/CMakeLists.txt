@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(remote_global_planner)
 
-add_library(global_planner_lib src/RemoteGlobalPlanner.cpp)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -120,9 +119,10 @@ include_directories(
 )
 
 ## Declare a C++ library
-# add_library(remote_global_planner
-#   src/${PROJECT_NAME}/remote_global_planner.cpp
-# )
+# add_library(global_planner_lib src/RemoteGlobalPlanner.cpp)
+add_library(remote_global_planner
+  src/RemoteGlobalPlanner.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -156,11 +156,11 @@ include_directories(
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS remote_global_planner remote_global_planner_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS remote_global_planner
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
