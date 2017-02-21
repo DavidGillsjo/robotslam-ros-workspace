@@ -1,0 +1,5 @@
+<library path="lib/global_planner_lib">
+    <class name="remote_global_planner/RemoteGlobalPlanner" type="remote_global_planner::RemoteGlobalPlanner" base_class_type="nav_core::BaseGlobalPlanner">
+        <description>Global planner that can take paths published to it and pass them on to the move_base stack.</description>
+    </class>
+</library>
