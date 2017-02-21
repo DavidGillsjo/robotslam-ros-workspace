@@ -10,6 +10,7 @@
 #include <angles/angles.h>
 #include <base_local_planner/world_model.h>
 #include <base_local_planner/costmap_model.h>
+#include <ros/callback_queue.h>
 
 using std::string;
 
@@ -24,8 +25,10 @@ namespace remote_global_planner {
         string name;
         costmap_t* costmap_ros;
         plan_t plan;
-        ros::NodeHandle node_handler;
+        ros::NodeHandle* node_handler;
         ros::Subscriber subscriber;
+        ros::AsyncSpinner* spinner;
+        ros::CallbackQueue* callback_queue;
         bool initialized;
     public:
         RemoteGlobalPlanner();

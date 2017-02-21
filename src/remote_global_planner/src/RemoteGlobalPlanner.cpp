@@ -22,11 +22,20 @@ namespace remote_global_planner
         {
             this->name = name;
             this->costmap_ros = costmap_ros;
-            this->node_handler = ros::NodeHandle("~/" + name);
+            this->plan = plan_t();
+            //this->callback_queue = new ros::CallbackQueue();
+            this->node_handler = new ros::NodeHandle(name);
+            //this->node_handler->setCallbackQueue(this->callback_queue);
 
-            ros::Subscriber sub = node_handler.subscribe("remote_global_plan_listener", 1000, &RemoteGlobalPlanner::planCallback, this);
+            this->subscriber = node_handler->subscribe("remote_global_plan_listener", 1, &RemoteGlobalPlanner::planCallback, this);
 
-            ROS_INFO("Remote global planner initialized successfully");
+//            this->spinner = new ros::AsyncSpinner(1);
+//            this->spinner->start();
+//            ros::waitForShutdown();
+//            ros::spin();
+
+            ROS_INFO_STREAM("Remote global planner initialized successfully, Name: " + name);
+//            ROS_INFO("Remote global planner initialized successfully");
             this->initialized = true;
         }
         else
@@ -38,11 +47,20 @@ namespace remote_global_planner
     bool RemoteGlobalPlanner::makePlan(const geometry_msgs::PoseStamped &start, const geometry_msgs::PoseStamped &goal,
                                        plan_t &plan)
     {
+        std::stringstream fmt;
+        fmt << "RemoteGlobalPlanner: makePlan(start: ["
+            << start.pose.position.x << ", " << start.pose.position.y << ", " << start.pose.position.z
+            << "], goal: ["
+            << goal.pose.position.x << ", " << goal.pose.position.y << ", " << goal.pose.position.z
+            << "])";
+        ROS_INFO_STREAM(fmt.str());
         plan = this->plan;
+        this->plan.clear();
     }
 
     void RemoteGlobalPlanner::planCallback(const nav_msgs::Path path)
     {
+        ROS_INFO("[===================] Remote global planner got a new plan. Will publish when asked for.");
         this->plan = path.poses;
     }
 }
