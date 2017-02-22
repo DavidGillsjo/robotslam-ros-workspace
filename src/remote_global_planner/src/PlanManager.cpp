@@ -1,42 +1,71 @@
 #include "PlanManager.h"
 
-remote_global_planner::PlanManager::PlanManager() {
-    ROS_INFO("PlanManager Started!");
-    this->rt_thread = new boost::thread(boost::bind(&PlanManager::listen, this));
-}
+namespace remote_global_planner {
 
-remote_global_planner::PlanManager::~PlanManager() {
-    ROS_INFO("PlanManager - Stopped!");
-    this->rt_thread->interrupt();
-}
-
-void remote_global_planner::PlanManager::listen() {
-    ROS_INFO("PlanManager - Started Listen Thread!");
-
-    tf::TransformListener listener;
-    ros::Rate rate(10.0);
-
-    while(ros::ok()) {
-
-        // Check if the thread is interuppted
-        boost::this_thread::interruption_point();
-
-        tf::StampedTransform transform;
-
-        try {
-            listener.lookupTransform("/base_link", "/map", ros::Time(0), transform);
-        } catch (tf::TransformException &ex) {
-            ROS_ERROR("%s", ex.what());
-            ros::Duration(1.0).sleep();
-            continue;
-        }
-
-        ROS_INFO_STREAM("MY POS IS " << transform.getOrigin().x());
-
-        rate.sleep();
+    PlanManager::PlanManager() {
+        ROS_INFO("PlanManager Started!");
+        this->rt_thread = new boost::thread(boost::bind(&PlanManager::listen, this));
     }
 
-    ROS_INFO("PlanManager - Stopped thread");
+    PlanManager::~PlanManager() {
+        ROS_INFO("PlanManager - Stopped!");
+        this->rt_thread->interrupt();
+    }
 
-    return;
+    void PlanManager::listen() {
+        ROS_INFO("PlanManager - Started Listen Thread!");
+
+        tf::TransformListener listener;
+        //ros::Rate rate(10.0);
+        ros::Rate rate(1.0);
+
+        while (ros::ok()) {
+
+            // Check if the thread is interuppted
+            boost::this_thread::interruption_point();
+
+            tf::StampedTransform transform;
+
+            try {
+                listener.lookupTransform("/base_link", "/map", ros::Time(0), transform);
+            } catch (tf::TransformException &ex) {
+                ROS_ERROR("%s", ex.what());
+                ros::Duration(1.0).sleep();
+                continue;
+            }
+
+            ROS_INFO_STREAM("MY POS IS " << transform.getOrigin().x());
+
+            if (plan.size() > 0) {
+                if (this->isAtWaypoint(transform.getOrigin(), plan[0])) {
+                    plan.erase(plan.begin());
+                }
+            }
+
+            rate.sleep();
+        }
+
+        ROS_INFO("PlanManager - Stopped thread");
+
+        return;
+    }
+
+    void PlanManager::planCallback(const nav_msgs::Path path) {
+        ROS_INFO("RemoteGlobalPlanner: Remote global planner got a new plan. Will publish when asked for.");
+        plan = path.poses;
+        //plan.insert(plan.begin(), pose_t());
+    }
+
+    plan_t PlanManager::getCurrentPlan() {
+        return plan;
+    }
+
+    const bool PlanManager::isAtWaypoint(const tf::Vector3 current_position, const pose_t waypoint) {
+        tf::Vector3 cp_vec(current_position.x(), current_position.y(),
+                           current_position.z());
+        tf::Vector3 wp_vec(waypoint.pose.position.x, waypoint.pose.position.y, waypoint.pose.position.z);
+        tfScalar distance = wp_vec.distance(cp_vec);
+        return distance <= this->waypoint_radius;
+    }
+
 }

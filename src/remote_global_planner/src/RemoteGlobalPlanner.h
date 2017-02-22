@@ -35,11 +35,9 @@ namespace remote_global_planner {
                       const geometry_msgs::PoseStamped& goal,
                       plan_t& plan
         );
-        void planCallback(const nav_msgs::Path path);
     private:
         string name;
         costmap_t* costmap_ros;
-        plan_t plan;
         ros::NodeHandle node_handler;
         ros::Subscriber subscriber;
         ros::Publisher publisher;
@@ -58,10 +56,6 @@ namespace remote_global_planner {
          */
         const bool isAtWaypoint(const pose_t current_position, const pose_t waypoint);
 
-        /**
-         * Used to listen for tf updates and remove waypoints from the plan as they are reached.
-         */
-        void updatePlan();
     };
 };
 #endif

@@ -23,9 +23,10 @@ namespace remote_global_planner
         {
             this->name = name;
             this->costmap_ros = costmap_ros;
-            this->plan = plan_t();
+            //this->plan = plan_t();
             this->node_handler = ros::NodeHandle("move_base/" + name);
-            this->subscriber = node_handler.subscribe("remote_global_plan_listener", 1, &RemoteGlobalPlanner::planCallback, this);
+            //this->subscriber = node_handler.subscribe("remote_global_plan_listener", 1, &RemoteGlobalPlanner::planCallback, this);
+            this->subscriber = node_handler.subscribe("remote_global_plan_listener", 1, &PlanManager::planCallback, &this->plan_manager);
             this->publisher = node_handler.advertise<nav_msgs::Path>("global_plan", 1);
             this->immediate_publisher = node_handler.advertise<nav_msgs::Path>("immediate_global_plan", 1);
 
@@ -50,11 +51,14 @@ namespace remote_global_planner
             << goal.pose.position.x << ", " << goal.pose.position.y << ", " << goal.pose.position.z
             << "])";
         ROS_INFO_STREAM(fmt.str());
+
+        plan_t plan = this->plan_manager.getCurrentPlan();
+
         if (plan.empty()) {
             return false;
         }
 
-        geometry_msgs::PoseStamped& current_waypoint = this->plan[0];
+        geometry_msgs::PoseStamped& current_waypoint = plan[0];
 
         /*tf::Vector3 cp_vec(start.pose.position.x, start.pose.position.y, start.pose.position.z);
         tf::Vector3 wp_vec(current_waypoint.pose.position.x, current_waypoint.pose.position.y, current_waypoint.pose.position.z);
@@ -65,11 +69,13 @@ namespace remote_global_planner
         ROS_INFO_STREAM(fmt_1.str());*/
 
         //plan[0] = start;
-        if (this->isAtWaypoint(start, current_waypoint))
+        /*if (this->isAtWaypoint(start, current_waypoint))
         {
             plan.erase(plan.begin());
         }
+        */
         //plan_out = plan;
+        //plan_out = manager.getCurrentPlan(start);
         plan_out = plan_t(plan.begin(), std::min(plan.begin() + 1, plan.end()));
         plan_out.insert(plan_out.begin(), start);
 
@@ -87,13 +93,6 @@ namespace remote_global_planner
         immediate_path.poses = plan_out;
         immediate_publisher.publish(immediate_path);
         return true;
-    }
-
-    void RemoteGlobalPlanner::planCallback(const nav_msgs::Path path)
-    {
-        ROS_INFO("RemoteGlobalPlanner: Remote global planner got a new plan. Will publish when asked for.");
-        plan = path.poses;
-        //plan.insert(plan.begin(), pose_t());
     }
 
     const bool RemoteGlobalPlanner::isAtWaypoint(const pose_t current_position, const pose_t waypoint)
