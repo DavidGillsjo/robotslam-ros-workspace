@@ -9,7 +9,9 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS
+  thread
+)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -119,7 +121,7 @@ include_directories(
 # add_library(global_planner_lib src/RemoteGlobalPlanner.cpp)
 add_library(remote_global_planner
   src/RemoteGlobalPlanner.cpp
-)
+        src/PlanManager.cpp src/PlanManager.h)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries

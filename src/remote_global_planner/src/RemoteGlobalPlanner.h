@@ -2,7 +2,6 @@
 /** for global path planner interface */
 #include <string>
 #include <algorithm>
-#include <thread>
 #include <ros/ros.h>
 #include <costmap_2d/costmap_2d_ros.h>
 #include <costmap_2d/costmap_2d.h>
@@ -13,6 +12,7 @@
 #include <base_local_planner/world_model.h>
 #include <base_local_planner/costmap_model.h>
 #include <tf/LinearMath/Vector3.h>
+#include "PlanManager.h"
 
 using std::string;
 
@@ -45,6 +45,7 @@ namespace remote_global_planner {
         ros::Publisher publisher;
         ros::Publisher immediate_publisher;
         bool initialized;
+        PlanManager plan_manager;
 
         // Parameters
         double waypoint_radius = 0.15;
