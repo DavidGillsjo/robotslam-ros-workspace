@@ -1,10 +1,11 @@
 #include <pluginlib/class_list_macros.h>
 #include "RemoteGlobalPlanner.h"
+#include <tf/LinearMath/Vector3.h>
 
 //register this planner as a BaseGlobalPlanner plugin
 namespace remote_global_planner
 {
-    PLUGINLIB_EXPORT_CLASS(remote_global_planner::RemoteGlobalPlanner, nav_core::BaseGlobalPlanner)
+    PLUGINLIB_EXPORT_CLASS(remote_global_planner::RemoteGlobalPlanner, nav_core::BaseGlobalPlanner);
     RemoteGlobalPlanner::RemoteGlobalPlanner()
     {
         this->initialized = false;
@@ -23,19 +24,14 @@ namespace remote_global_planner
             this->name = name;
             this->costmap_ros = costmap_ros;
             this->plan = plan_t();
-            //this->callback_queue = new ros::CallbackQueue();
-            this->node_handler = new ros::NodeHandle(name);
-            //this->node_handler->setCallbackQueue(this->callback_queue);
+            this->node_handler = ros::NodeHandle("move_base/" + name);
+            this->subscriber = node_handler.subscribe("remote_global_plan_listener", 1, &RemoteGlobalPlanner::planCallback, this);
+            this->publisher = node_handler.advertise<nav_msgs::Path>("global_plan", 1);
+            this->immediate_publisher = node_handler.advertise<nav_msgs::Path>("immediate_global_plan", 1);
 
-            this->subscriber = node_handler->subscribe("remote_global_plan_listener", 1, &RemoteGlobalPlanner::planCallback, this);
+            this->node_handler.param("waypoint_radius", this->waypoint_radius, this->waypoint_radius);
 
-//            this->spinner = new ros::AsyncSpinner(1);
-//            this->spinner->start();
-//            ros::waitForShutdown();
-//            ros::spin();
-
-            ROS_INFO_STREAM("Remote global planner initialized successfully, Name: " + name);
-//            ROS_INFO("Remote global planner initialized successfully");
+            ROS_INFO_STREAM("RemoteGlobalPlanner: Initialized successfully, Name: " + name);
             this->initialized = true;
         }
         else
@@ -45,7 +41,7 @@ namespace remote_global_planner
     }
 
     bool RemoteGlobalPlanner::makePlan(const geometry_msgs::PoseStamped &start, const geometry_msgs::PoseStamped &goal,
-                                       plan_t &plan)
+                                       plan_t &plan_out)
     {
         std::stringstream fmt;
         fmt << "RemoteGlobalPlanner: makePlan(start: ["
@@ -54,13 +50,57 @@ namespace remote_global_planner
             << goal.pose.position.x << ", " << goal.pose.position.y << ", " << goal.pose.position.z
             << "])";
         ROS_INFO_STREAM(fmt.str());
-        plan = this->plan;
-        this->plan.clear();
+        if (plan.empty()) {
+            return false;
+        }
+
+        geometry_msgs::PoseStamped& current_waypoint = this->plan[0];
+
+        /*tf::Vector3 cp_vec(start.pose.position.x, start.pose.position.y, start.pose.position.z);
+        tf::Vector3 wp_vec(current_waypoint.pose.position.x, current_waypoint.pose.position.y, current_waypoint.pose.position.z);
+        tfScalar distance = wp_vec.distance(cp_vec);
+
+        std::stringstream fmt_1;
+        fmt_1 << "RemoteGlobalPlanner: " << distance << "m from next waypoint";
+        ROS_INFO_STREAM(fmt_1.str());*/
+
+        //plan[0] = start;
+        if (this->isAtWaypoint(start, current_waypoint))
+        {
+            plan.erase(plan.begin());
+        }
+        //plan_out = plan;
+        plan_out = plan_t(plan.begin(), std::min(plan.begin() + 1, plan.end()));
+        plan_out.insert(plan_out.begin(), start);
+
+        nav_msgs::Path path;
+        path.header.frame_id = "map";
+        path.header.seq = 50;
+        path.header.stamp = ros::Time();
+        path.poses = plan;
+        publisher.publish(path);
+
+        nav_msgs::Path immediate_path;
+        immediate_path.header.frame_id = "map";
+        immediate_path.header.seq = 50;
+        immediate_path.header.stamp = ros::Time();
+        immediate_path.poses = plan_out;
+        immediate_publisher.publish(immediate_path);
+        return true;
     }
 
     void RemoteGlobalPlanner::planCallback(const nav_msgs::Path path)
     {
-        ROS_INFO("[===================] Remote global planner got a new plan. Will publish when asked for.");
-        this->plan = path.poses;
+        ROS_INFO("RemoteGlobalPlanner: Remote global planner got a new plan. Will publish when asked for.");
+        plan = path.poses;
+        //plan.insert(plan.begin(), pose_t());
+    }
+
+    const bool RemoteGlobalPlanner::isAtWaypoint(const pose_t current_position, const pose_t waypoint)
+    {
+        tf::Vector3 cp_vec(current_position.pose.position.x, current_position.pose.position.y, current_position.pose.position.z);
+        tf::Vector3 wp_vec(waypoint.pose.position.x, waypoint.pose.position.y, waypoint.pose.position.z);
+        tfScalar distance = wp_vec.distance(cp_vec);
+        return distance <= this->waypoint_radius;
     }
 }

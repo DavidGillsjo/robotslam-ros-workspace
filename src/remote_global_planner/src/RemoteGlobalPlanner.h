@@ -1,6 +1,8 @@
 /** include the libraries you need in your planner here */
 /** for global path planner interface */
 #include <string>
+#include <algorithm>
+#include <thread>
 #include <ros/ros.h>
 #include <costmap_2d/costmap_2d_ros.h>
 #include <costmap_2d/costmap_2d.h>
@@ -10,7 +12,7 @@
 #include <angles/angles.h>
 #include <base_local_planner/world_model.h>
 #include <base_local_planner/costmap_model.h>
-#include <ros/callback_queue.h>
+#include <tf/LinearMath/Vector3.h>
 
 using std::string;
 
@@ -18,18 +20,11 @@ using std::string;
 #define GLOBAL_PLANNER_CPP
 
 namespace remote_global_planner {
-    typedef std::vector<geometry_msgs::PoseStamped> plan_t;
+    typedef geometry_msgs::PoseStamped pose_t;
+    typedef std::vector<pose_t> plan_t;
     typedef costmap_2d::Costmap2DROS costmap_t;
 
     class RemoteGlobalPlanner : public nav_core::BaseGlobalPlanner {
-        string name;
-        costmap_t* costmap_ros;
-        plan_t plan;
-        ros::NodeHandle* node_handler;
-        ros::Subscriber subscriber;
-        ros::AsyncSpinner* spinner;
-        ros::CallbackQueue* callback_queue;
-        bool initialized;
     public:
         RemoteGlobalPlanner();
         RemoteGlobalPlanner(string name, costmap_t* costmap_ros);
@@ -41,6 +36,31 @@ namespace remote_global_planner {
                       plan_t& plan
         );
         void planCallback(const nav_msgs::Path path);
+    private:
+        string name;
+        costmap_t* costmap_ros;
+        plan_t plan;
+        ros::NodeHandle node_handler;
+        ros::Subscriber subscriber;
+        ros::Publisher publisher;
+        ros::Publisher immediate_publisher;
+        bool initialized;
+
+        // Parameters
+        double waypoint_radius = 0.15;
+
+        /**
+         * Checks if current_position is the same position as waypoint.
+         * @param current_position Position to compare to waypoint.
+         * @param waypoint Position to compare current_position to.
+         * @return True if current_position is within the #RemoteGlobalPlanner::waypoint_radius of waypoint
+         */
+        const bool isAtWaypoint(const pose_t current_position, const pose_t waypoint);
+
+        /**
+         * Used to listen for tf updates and remove waypoints from the plan as they are reached.
+         */
+        void updatePlan();
     };
 };
 #endif
