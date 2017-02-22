@@ -1,18 +1,18 @@
 #!/usr/bin/env python
-import time
 from scapy.all import *
+
 
 class Sniffer:
     def __init__(self, interface):
         # Radiotap field specification
-        self.radiotap_formats = {"TSFT":"Q", "Flags":"B", "Rate":"B",
-            "Channel":"HH", "FHSS":"BB", "dBm_AntSignal":"b", "dBm_AntNoise":"b",
-            "Lock_Quality":"H", "TX_Attenuation":"H", "dB_TX_Attenuation":"H",
-            "dBm_TX_Power":"b", "Antenna":"B",    "dB_AntSignal":"B",
-            "dB_AntNoise":"B", "b14":"H", "b15":"B", "b16":"B", "b17":"B", "b18":"B",
-            "b19":"BBB", "b20":"LHBB", "b21":"HBBBBBH", "b22":"B", "b23":"B",
-            "b24":"B", "b25":"B", "b26":"B", "b27":"B", "b28":"B", "b29":"B",
-            "b30":"B", "Ext":"B"}
+        self.radiotap_formats = {"TSFT": "Q", "Flags": "B", "Rate": "B",
+                                 "Channel": "HH", "FHSS": "BB", "dBm_AntSignal": "b", "dBm_AntNoise": "b",
+                                 "Lock_Quality": "H", "TX_Attenuation": "H", "dB_TX_Attenuation": "H",
+                                 "dBm_TX_Power": "b", "Antenna": "B", "dB_AntSignal": "B",
+                                 "dB_AntNoise": "B", "b14": "H", "b15": "B", "b16": "B", "b17": "B", "b18": "B",
+                                 "b19": "BBB", "b20": "LHBB", "b21": "HBBBBBH", "b22": "B", "b23": "B",
+                                 "b24": "B", "b25": "B", "b26": "B", "b27": "B", "b28": "B", "b29": "B",
+                                 "b30": "B", "Ext": "B"}
         self.interface = interface
         self.running = False
 
@@ -22,18 +22,19 @@ class Sniffer:
     # callback(SSID, BSSID, RSSI)
     def start(self, callback):
         self.running = True
+
         def sniff_callback(pkt):
             if pkt.haslayer(Dot11) and pkt.type == 0 and pkt.subtype == 8:
                 addr, rssi = self.parsePacket(pkt)
                 try:
                     if addr is not None and rssi is not None and pkt.info is not None and pkt.info is not "":
-                        #print "%d,%s,%s,%s" % (int(time.time()), pkt.info, addr, rssi)
+                        # print "%d,%s,%s,%s" % (int(time.time()), pkt.info, addr, rssi)
                         callback(pkt.info, addr, rssi)
                 except AttributeError:
                     pass
-                    #print 'Weird attribute error'
+                    # print 'Weird attribute error'
 
-        sniff(iface = self.interface, prn = sniff_callback, stop_filter = self.should_exit)
+        sniff(iface=self.interface, prn=sniff_callback, stop_filter=self.should_exit, store=0)
 
     def stop(self):
         self.running = False
@@ -52,7 +53,7 @@ class Sniffer:
                     # some fields consist of more than one value
                     if name == "dBm_AntSignal":
                         # correct for little endian format sign
-                        rssipos = len(fmt)-1
+                        rssipos = len(fmt) - 1
                     fmt = fmt + self.radiotap_formats[name]
                 # unfortunately not all platforms work equally well and on my arm
                 # platform notdecoded was padded with a ton of zeros without
