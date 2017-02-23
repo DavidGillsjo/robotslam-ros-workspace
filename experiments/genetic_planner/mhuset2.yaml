@@ -1,0 +1,23 @@
+image: mhuset2.pgm
+resolution: 0.025
+origin: [-25, -13, 0]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196
+image_size:
+  width: 4032
+  height: 2848
+gps_references:
+  - lat: 55.70891705659837
+    lng: 13.209316134452822
+    x: 0
+    'y': 0
+  - lat: 55.709798046990976
+    lng: 13.209702372550966
+    x: 100.8
+    'y': 0
+  - lat: 55.70878407519093
+    lng: 13.210485577583315
+    x: 0
+    'y': 71.2
+
