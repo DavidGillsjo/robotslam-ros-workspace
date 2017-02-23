@@ -1,0 +1,27 @@
+image: fail1.pgm
+resolution: 0.05
+origin:
+  - -5.27361
+  - -17.77674
+  - 0
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196
+width_meters: 74.65
+height: 54.8
+gps_references:
+  - lat: 55.70894879073099
+    lng: 13.209774792194366
+    x: 0
+    'y': 54.8
+  - lat: 55.709702846585124
+    lng: 13.209761381149294
+    x: 74.65
+    'y': 54.8
+  - lat: 55.70898354713237
+    lng: 13.210812807083132
+    x: 0
+    'y': 0
+image_size:
+  width: 1493
+  height: 1096
