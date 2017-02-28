@@ -9,9 +9,11 @@ grid_size = (size(image.data) * image.resolution) / cell_size;
 
 free_matrix = find_free_cells(image, grid_size);
 
+%obstacle_matrix = distance_to_obstacles(free_matrix);
 goal_cell = find(free_matrix == 1, 1);
 
-distances = bfs(goal_cell, free_matrix);
+%distances = bfs(goal_cell, free_matrix);
+distances = dijkstra(goal_cell, free_matrix, obstacle_matrix);
 distances(free_matrix == 0) = -inf;
 
 path = path_plan(distances);
