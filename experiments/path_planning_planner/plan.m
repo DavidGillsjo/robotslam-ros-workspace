@@ -7,11 +7,17 @@ cell_size = 0.3;
 grid_size = (size(image.data) * image.resolution) / cell_size;
 %grid = zeros(ceil(grid_size));
 
-free_matrix = find_free_cells(image, grid);
+free_matrix = find_free_cells(image, grid_size);
 
 goal_cell = find(free_matrix == 1, 1);
 
 distances = bfs(goal_cell, free_matrix);
+distances(free_matrix == 0) = -inf;
 
+path = path_plan(distances);
 
-%imshow(image.data);
+figure
+imshow(free_matrix, [0 1]);
+hold on
+plot(path(:, 2), path(:, 1));
+hold off
