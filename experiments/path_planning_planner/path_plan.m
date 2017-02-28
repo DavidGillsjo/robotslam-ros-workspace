@@ -55,7 +55,6 @@ function [ path ] = path_plan( distances )
             break;
         end
     end
-    
 end
 
 function [node] = find_max(visited, distances, current_row, current_col)

@@ -14,7 +14,5 @@ function [ matrix ] = find_free_cells( image, grid_size )
             matrix = L == i;
         end
     end
-    
-    %matrix = find(transform == 1);
 end
 

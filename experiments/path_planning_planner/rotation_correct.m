@@ -6,6 +6,5 @@ function [ image ] = rotation_correct( image )
 %   to the coordinate base.
 
     image.data = imrotate(image.data, -13);
-
 end
 

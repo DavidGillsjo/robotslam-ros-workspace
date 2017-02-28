@@ -37,10 +37,6 @@ function [ distances ] = bfs( goal, free_matrix )
                 distances(new_queue.row, new_queue.col) = new_queue.dist;
             end
         end
-        
     end
-    
-    
-
 end
 
