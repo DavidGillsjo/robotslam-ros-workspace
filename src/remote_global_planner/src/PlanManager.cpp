@@ -30,15 +30,20 @@ namespace remote_global_planner {
                 listener.lookupTransform("/map", "/base_link", ros::Time(0), transform);
             } catch (tf::TransformException &ex) {
                 ROS_ERROR("%s", ex.what());
-                ros::Duration(1.0).sleep();
+//                ros::Duration(1.0).sleep();
+                rate.sleep();
                 continue;
             }
 
 //            ROS_INFO_STREAM("MY POS IS " << transform.getOrigin().x() << ", " << transform.getOrigin().y());
 
             if (plan.size() > 0) {
-                if (this->isAtWaypoint(transform.getOrigin(), plan[0])) {
-                    plan.erase(plan.begin());
+                for (int i = 0; i < immediate_waypoints; ++i)
+                {
+                    if (this->isAtWaypoint(transform.getOrigin(), plan[i]))
+                    {
+                        plan.erase(plan.begin(), plan.begin() + i + 1);
+                    }
                 }
             }
 
@@ -57,6 +62,10 @@ namespace remote_global_planner {
     }
 
     plan_t PlanManager::getCurrentPlan() {
+        return plan_t(plan.begin(), std::min(plan.begin() + immediate_waypoints, plan.end()));
+    }
+
+    plan_t PlanManager::getFullPlan() {
         return plan;
     }
 

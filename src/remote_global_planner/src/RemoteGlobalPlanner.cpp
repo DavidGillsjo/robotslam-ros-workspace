@@ -52,13 +52,13 @@ namespace remote_global_planner
             << "])";
         ROS_INFO_STREAM(fmt.str());
 
-        plan_t plan = this->plan_manager.getCurrentPlan();
+        plan_out = this->plan_manager.getCurrentPlan();
 
-        if (plan.empty()) {
+        if (plan_out.empty()) {
             return false;
         }
 
-        geometry_msgs::PoseStamped& current_waypoint = plan[0];
+        geometry_msgs::PoseStamped& current_waypoint = plan_out[0];
 
         /*tf::Vector3 cp_vec(start.pose.position.x, start.pose.position.y, start.pose.position.z);
         tf::Vector3 wp_vec(current_waypoint.pose.position.x, current_waypoint.pose.position.y, current_waypoint.pose.position.z);
@@ -76,14 +76,14 @@ namespace remote_global_planner
         */
         //plan_out = plan;
         //plan_out = manager.getCurrentPlan(start);
-        plan_out = plan_t(plan.begin(), std::min(plan.begin() + 1, plan.end()));
+        //plan_out = plan_t(plan.begin(), std::min(plan.begin() + 2, plan.end()));
         plan_out.insert(plan_out.begin(), start);
 
         nav_msgs::Path path;
         path.header.frame_id = "map";
         path.header.seq = 50;
         path.header.stamp = ros::Time();
-        path.poses = plan;
+        path.poses = this->plan_manager.getFullPlan();
         publisher.publish(path);
 
         nav_msgs::Path immediate_path;

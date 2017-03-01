@@ -17,12 +17,14 @@ namespace remote_global_planner {
         void planCallback(const nav_msgs::Path path);
 
         plan_t getCurrentPlan();
+        plan_t getFullPlan();
     private:
         boost::thread* rt_thread;
         plan_t plan;
 
         // Parameters
-        double waypoint_radius = 0.15;
+        double waypoint_radius = 0.25;
+        int immediate_waypoints = 2;
 
         /**
          * Listen to TF updates
