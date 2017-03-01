@@ -5,6 +5,6 @@ function [ image ] = rotation_correct( image )
 %   automatically rotate the image so that those lines are parallel
 %   to the coordinate base.
 
-    image.data = imrotate(image.data, -13);
+    image.data = imrotate(image.data, -90);
 end
 
