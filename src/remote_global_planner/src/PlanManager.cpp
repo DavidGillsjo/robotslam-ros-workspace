@@ -17,7 +17,7 @@ namespace remote_global_planner {
 
         tf::TransformListener listener;
         //ros::Rate rate(10.0);
-        ros::Rate rate(1.0);
+        ros::Rate rate(5.0);
 
         while (ros::ok()) {
 
@@ -27,14 +27,14 @@ namespace remote_global_planner {
             tf::StampedTransform transform;
 
             try {
-                listener.lookupTransform("/base_link", "/map", ros::Time(0), transform);
+                listener.lookupTransform("/map", "/base_link", ros::Time(0), transform);
             } catch (tf::TransformException &ex) {
                 ROS_ERROR("%s", ex.what());
                 ros::Duration(1.0).sleep();
                 continue;
             }
 
-            ROS_INFO_STREAM("MY POS IS " << transform.getOrigin().x());
+//            ROS_INFO_STREAM("MY POS IS " << transform.getOrigin().x() << ", " << transform.getOrigin().y());
 
             if (plan.size() > 0) {
                 if (this->isAtWaypoint(transform.getOrigin(), plan[0])) {
@@ -65,6 +65,8 @@ namespace remote_global_planner {
                            current_position.z());
         tf::Vector3 wp_vec(waypoint.pose.position.x, waypoint.pose.position.y, waypoint.pose.position.z);
         tfScalar distance = wp_vec.distance(cp_vec);
+//        ROS_INFO_STREAM("Next Waypoint: " << waypoint.pose.position.x << ", " << waypoint.pose.position.y);
+//        ROS_INFO_STREAM("Distance to waypoint: " << distance);
         return distance <= this->waypoint_radius;
     }
 
