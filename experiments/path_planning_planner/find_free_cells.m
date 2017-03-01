@@ -5,6 +5,7 @@ function [ matrix ] = find_free_cells( image, grid_size )
     %grid_size = size(grid); 
     scale = grid_size(1) / image_size(1);
     matrix = imresize(image.data, scale, 'box'); 
+    matrix(matrix < 255) = 0;
     
     [L, num] = bwlabel(matrix);
     maxS = 0;

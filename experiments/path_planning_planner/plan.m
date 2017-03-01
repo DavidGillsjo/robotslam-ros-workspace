@@ -1,11 +1,13 @@
 load 'mhuset2';
-
-image.data = logical(image.data > 220);
+%image.data = logical(image.data > 220);
 image = rotation_correct(image);
+
+threshold = 220;
+image.data(image.data < threshold) = 0;
+image.data(image.data >= threshold) = 255;
 
 cell_size = 0.3;
 grid_size = (size(image.data) * image.resolution) / cell_size;
-%grid = zeros(ceil(grid_size));
 
 free_matrix = find_free_cells(image, grid_size);
 
