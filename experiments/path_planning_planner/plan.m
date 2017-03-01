@@ -1,5 +1,6 @@
 load 'mhuset2';
 %image.data = logical(image.data > 220);
+original_image = image;
 image = rotation_correct(image);
 
 threshold = 220;
@@ -18,13 +19,14 @@ distances = bfs(goal_cell, free_matrix);
 %distances = dijkstra(goal_cell, free_matrix, obstacle_matrix);
 distances(free_matrix == 0) = -inf;
 
-path = path_plan(distances);
+path = path_plan(distances) - 0.5;
 
-figure
-imshow(free_matrix, [0 1]);
-hold on
-plot(path(:, 2), path(:, 1));
-hold off
+% figure
+% imshow(free_matrix, [0 1]);
+% hold on
+% plot(path(:, 2), path(:, 1));
+% hold off
+% plot_full(free_matrix, 1, path);
 
 image_size = size(image.data);
 
@@ -39,3 +41,7 @@ format_paths = format_path(correct_path * image.resolution);
 fid = fopen('route.json', 'w');
 fprintf(fid, jsonencode(format_paths));
 fclose(fid);
+
+img = rotation_correct(original_image);
+%plot_full(image.data, scal, path, 1 - free_matrix);
+plot_full(image.data, scal, path);
