@@ -1,6 +1,7 @@
 function [ output_args ] = plot_full( image_data, scal, path, image_data_2 )
 %PLOT_FULL Summary of this function goes here
 %   Detailed explanation goes here
+    image_data = uint8(image_data * 255);
     if nargin < 4
         image_data_2 = uint8(ones(size(image_data)));
     else

@@ -10,7 +10,7 @@ function [ path ] = path_plan( distances )
     
     % Set goal to position with highest value
     %start = find(distances == max(max(distances)), 1);
-    start = 10840; % hardcoded position closer to robot start pos in stage.
+    start = 8680; % hardcoded position closer to robot start pos in stage.
     
     [start_row, start_col] = ind2sub(size(distances), start);
     [current_row, current_col] = ind2sub(size(distances), start);

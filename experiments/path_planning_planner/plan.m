@@ -7,7 +7,7 @@ threshold = 220;
 image.data(image.data < threshold) = 0;
 image.data(image.data >= threshold) = 255;
 
-cell_size = 0.3;
+cell_size = 0.40;
 grid_size = (size(image.data) * image.resolution) / cell_size;
 
 free_matrix = find_free_cells(image, grid_size);
@@ -26,7 +26,7 @@ path = path_plan(distances) - 0.5;
 % hold on
 % plot(path(:, 2), path(:, 1));
 % hold off
-% plot_full(free_matrix, 1, path);
+%plot_full(free_matrix, 1, path);
 
 image_size = size(image.data);
 
