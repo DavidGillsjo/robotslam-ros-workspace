@@ -12,6 +12,7 @@
 #include <base_local_planner/world_model.h>
 #include <base_local_planner/costmap_model.h>
 #include <tf/LinearMath/Vector3.h>
+#include <navfn/navfn_ros.h>
 #include "PlanManager.h"
 
 using std::string;
@@ -44,6 +45,7 @@ namespace remote_global_planner {
         ros::Publisher immediate_publisher;
         bool initialized;
         PlanManager plan_manager;
+        navfn::NavfnROS navfn;
 
         // Parameters
         double waypoint_radius = 0.15;

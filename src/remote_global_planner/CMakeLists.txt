@@ -5,7 +5,7 @@ project(remote_global_planner)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  nav_core roscpp rospy std_msgs tf
+  nav_core navfn roscpp rospy std_msgs tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -100,10 +100,11 @@ find_package(Boost REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES remote_global_planner
-#  CATKIN_DEPENDS nav_core roscpp rospy std_msgs
-#  DEPENDS system_lib
+  #INCLUDE_DIRS include
+  LIBRARIES remote_global_planner
+  CATKIN_DEPENDS
+        roscpp
+        navfn
 )
 
 ###########
@@ -114,7 +115,8 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
-  ${catkin_INCLUDE_DIRS}
+        include
+        ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -136,9 +138,9 @@ add_library(remote_global_planner
 # add_dependencies(remote_global_planner_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(remote_global_planner_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(remote_global_planner
+    ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##

@@ -29,6 +29,7 @@ namespace remote_global_planner
             this->subscriber = node_handler.subscribe("remote_global_plan_listener", 1, &PlanManager::planCallback, &this->plan_manager);
             this->publisher = node_handler.advertise<nav_msgs::Path>("global_plan", 1);
             this->immediate_publisher = node_handler.advertise<nav_msgs::Path>("immediate_global_plan", 1);
+            this->navfn.initialize("bg_navfn_planner", costmap_ros);
 
             this->node_handler.param("waypoint_radius", this->waypoint_radius, this->waypoint_radius);
 
@@ -55,29 +56,21 @@ namespace remote_global_planner
         plan_out = this->plan_manager.getCurrentPlan();
 
         if (plan_out.empty()) {
+            ROS_INFO("RemoteGlobalPlanner: Plan empty.");
             return false;
         }
 
         geometry_msgs::PoseStamped& current_waypoint = plan_out[0];
 
-        /*tf::Vector3 cp_vec(start.pose.position.x, start.pose.position.y, start.pose.position.z);
-        tf::Vector3 wp_vec(current_waypoint.pose.position.x, current_waypoint.pose.position.y, current_waypoint.pose.position.z);
-        tfScalar distance = wp_vec.distance(cp_vec);
-
-        std::stringstream fmt_1;
-        fmt_1 << "RemoteGlobalPlanner: " << distance << "m from next waypoint";
-        ROS_INFO_STREAM(fmt_1.str());*/
-
-        //plan[0] = start;
-        /*if (this->isAtWaypoint(start, current_waypoint))
-        {
-            plan.erase(plan.begin());
+        plan_t navfn_plan;
+        ROS_INFO("RemoteGlobalPlanner: Asking NavFN");
+        if (navfn.makePlan(start, current_waypoint, navfn_plan)) {
+            plan_out.insert(plan_out.begin(), navfn_plan.begin(), navfn_plan.end());
+            ROS_INFO_STREAM("NavFN Size: " << navfn_plan.size());
+        } else {
+            ROS_INFO("NavFN failed, falling back to straight line.");
+            plan_out.insert(plan_out.begin(), start);
         }
-        */
-        //plan_out = plan;
-        //plan_out = manager.getCurrentPlan(start);
-        //plan_out = plan_t(plan.begin(), std::min(plan.begin() + 2, plan.end()));
-        plan_out.insert(plan_out.begin(), start);
 
         nav_msgs::Path path;
         path.header.frame_id = "map";
