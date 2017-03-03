@@ -19,7 +19,9 @@ distances = bfs(goal_cell, free_matrix);
 %distances = dijkstra(goal_cell, free_matrix, obstacle_matrix);
 distances(free_matrix == 0) = -inf;
 
-path = path_plan(distances) - 0.5;
+% start = find(distances == max(max(distances)), 1);
+start = 8680; % hardcoded position closer to robot start pos in stage.
+path = path_plan(distances, start) - 0.5;
 
 % figure
 % imshow(free_matrix, [0 1]);

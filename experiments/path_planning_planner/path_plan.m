@@ -1,4 +1,4 @@
-function [ path ] = path_plan( distances )
+function [ path ] = path_plan( distances, start )
 %PATH_PLAN Summary of this function goes here
 %   path is a matrix of two column vectors [x y]
     %path = zeros(numel(find(distances > 0)), 2);
@@ -7,10 +7,6 @@ function [ path ] = path_plan( distances )
     visited = zeros(size(distances));
     
     %goal = find(distances == 1, 1);
-    
-    % Set goal to position with highest value
-    %start = find(distances == max(max(distances)), 1);
-    start = 8680; % hardcoded position closer to robot start pos in stage.
     
     [start_row, start_col] = ind2sub(size(distances), start);
     [current_row, current_col] = ind2sub(size(distances), start);
@@ -67,6 +63,11 @@ function [node] = find_max(visited, distances, current_row, current_col)
     % Silly loop to cover all movements, don't hate me. :(
     for r = -1:1
         for c = -1:1
+            % Check if outside the grid
+            if (current_row + r > size(distances, 1) || current_col + c > size(distances, 2))
+                continue;
+            end
+            
             if ((r == 0 && c == 0) || visited(current_row + r, current_col + c))
                 continue;
             end
