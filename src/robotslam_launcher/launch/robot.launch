@@ -2,7 +2,6 @@
   <include file="$(find robotslam_launcher)/launch/includes/rplidar.launch.xml"/>
   <include file="$(find robotslam_launcher)/launch/includes/bringup.launch.xml"/>
 
-  <include file="$(find robotslam_launcher)/launch/includes/velocity_smoother.launch.xml"/>
+  <!--<include file="$(find robotslam_launcher)/launch/includes/velocity_smoother.launch.xml"/>-->
   <include file="$(find robotslam_launcher)/launch/includes/safety_controller.launch.xml"/>
-  <remap from="cmd_vel" to="navigation_velocity_smoother/raw_cmd_vel"/>
 </launch>
