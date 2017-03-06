@@ -1,4 +1,4 @@
-load 'mhuset2';
+load 'mhuset2_nostairs';
 %image.data = logical(image.data > 220);
 original_image = image;
 image = rotation_correct(image);
