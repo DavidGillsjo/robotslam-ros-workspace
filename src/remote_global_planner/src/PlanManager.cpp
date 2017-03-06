@@ -69,6 +69,10 @@ namespace remote_global_planner {
         return plan;
     }
 
+    void PlanManager::skipWaypoint(const std_msgs::Header header) {
+        plan.erase(plan.begin(), plan.begin() + 1);
+    }
+
     const bool PlanManager::isAtWaypoint(const tf::Vector3 current_position, const pose_t waypoint) {
         tf::Vector3 cp_vec(current_position.x(), current_position.y(),
                            current_position.z());

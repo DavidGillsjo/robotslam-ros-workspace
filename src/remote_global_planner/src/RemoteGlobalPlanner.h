@@ -41,6 +41,7 @@ namespace remote_global_planner {
         costmap_t* costmap_ros;
         ros::NodeHandle node_handler;
         ros::Subscriber subscriber;
+        ros::Subscriber skipWaypoint_subscriber;
         ros::Publisher publisher;
         ros::Publisher immediate_publisher;
         bool initialized;

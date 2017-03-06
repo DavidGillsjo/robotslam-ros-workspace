@@ -27,6 +27,7 @@ namespace remote_global_planner
             this->node_handler = ros::NodeHandle("move_base/" + name);
             //this->subscriber = node_handler.subscribe("remote_global_plan_listener", 1, &RemoteGlobalPlanner::planCallback, this);
             this->subscriber = node_handler.subscribe("remote_global_plan_listener", 1, &PlanManager::planCallback, &this->plan_manager);
+            this->skipWaypoint_subscriber = node_handler.subscribe("skip_waypoint", 1, &PlanManager::skipWaypoint, &this->plan_manager);
             this->publisher = node_handler.advertise<nav_msgs::Path>("global_plan", 1);
             this->immediate_publisher = node_handler.advertise<nav_msgs::Path>("immediate_global_plan", 1);
             this->navfn.initialize("bg_navfn_planner", costmap_ros);

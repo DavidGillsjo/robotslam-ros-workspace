@@ -15,6 +15,7 @@ namespace remote_global_planner {
         PlanManager();
         ~PlanManager();
         void planCallback(const nav_msgs::Path path);
+        void skipWaypoint(const std_msgs::Header header);
 
         plan_t getCurrentPlan();
         plan_t getFullPlan();
