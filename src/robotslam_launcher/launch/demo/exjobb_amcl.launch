@@ -1,9 +1,14 @@
 <launch>
+  <!--  ****** Maps *****  -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find robotslam_launcher)/worlds/mhuset2.yaml">
+    <param name="frame_id" value="/map"/>
+  </node>
+
   <include file="$(find robotslam_launcher)/launch/demo/includes/stage.xml">
-    <arg name="map_file" value="$(find robotslam_launcher)/worlds/mhuset2_halfsize.yaml"/>
-    <arg name="world_file" value="$(find robotslam_launcher)/worlds/mhuset2_halfsize.world"/>
+    <arg name="map_file" value="$(find robotslam_launcher)/worlds/mhuset2.yaml"/>
+    <arg name="world_file" value="$(find robotslam_launcher)/worlds/mhuset2.world"/>
   </include>
-  
+
   <include file="$(find robotslam_launcher)/launch/includes/amcl/amcl.launch.xml">
     <arg name="scan_topic" value="scan"/>
     <arg name="use_map_topic" value="true"/>

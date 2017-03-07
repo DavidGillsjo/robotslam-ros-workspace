@@ -1,0 +1,16 @@
+<launch>
+
+    <!-- Set to your sensor's range -->
+    <arg name="sensor_range" default="5.0"/>
+
+    <node pkg="frontier_exploration" type="explore_client" name="explore_client" output="screen"/>
+
+    <node pkg="frontier_exploration" type="explore_server" name="explore_server" output="screen" >
+      <param name="frequency" type="double" value="2.0"/>
+      <param name="goal_aliasing" type="double" value="$(arg sensor_range)"/>
+
+      #All standard costmap_2d parameters as in move_base, other than BoundedExploreLayer
+      <rosparam file="$(find robotslam_launcher)/param/frontier_exploration.yaml" command="load" ns="explore_costmap" subst_value="true"/>
+    </node>
+
+</launch>
