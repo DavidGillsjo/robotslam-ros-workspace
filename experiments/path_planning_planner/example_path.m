@@ -19,13 +19,15 @@ image.data = [
 image.data(image.data == 1) = 255;
 free_matrix = find_free_cells(image, grid_size);
 
-%obstacle_matrix = distance_to_obstacles(free_matrix);
+obstacle_matrix = distance_to_obstacles(free_matrix);
 goal_cell = sub2ind(size(free_matrix), 8, 9);
 
-distances = bfs(goal_cell, free_matrix);
+%distances = bfs(goal_cell, free_matrix);
+distances = dijkstra(goal_cell, free_matrix, obstacle_matrix);
 distances(free_matrix == 0) = -inf;
 
-start = find(distances == max(max(distances)), 1);
+%start = find(distances == max(max(distances)), 1);
+start = 12;
 path = path_plan(distances, start);% - 0.5;
 
 % figure

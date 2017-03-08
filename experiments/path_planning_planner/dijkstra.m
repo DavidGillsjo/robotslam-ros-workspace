@@ -3,7 +3,6 @@ function [ distances ] = dijkstra( goal, free_matrix, cost_matrix )
     
     distances = zeros(size(free_matrix));
     distances(:) = inf;
-    is_in_queue = zeros(size(free_matrix));
     
     [goal_row, goal_col] = ind2sub(size(free_matrix), goal);
     
@@ -19,7 +18,6 @@ function [ distances ] = dijkstra( goal, free_matrix, cost_matrix )
         pos = queue{min_i};
         cost = distances(pos.row, pos.col);
         queue(min_i) = [];
-        is_in_queue(pos.row, pos.col) = 0;
         
         % Add adjacency coords to queue.
         for r = -1:1
@@ -40,6 +38,9 @@ function [ distances ] = dijkstra( goal, free_matrix, cost_matrix )
                 if (new_cost < distances(new_queue.row, new_queue.col))
                     index = find_in_queue(new_queue, queue);
                     distances(new_queue.row, new_queue.col) = new_cost;
+                    if (~index)
+                        queue{end+1} = new_queue;
+                    end
                 end
             end
         end
