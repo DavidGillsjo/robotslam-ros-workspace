@@ -57,3 +57,5 @@ devel_isolated/
 install_isolated/
 
 *cmake-build-debug
+
+experiments/matlab2tikz

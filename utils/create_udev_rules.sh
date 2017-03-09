@@ -5,6 +5,7 @@ echo "rplidar usb connection as /dev/rplidar , check it using the command : ls -
 echo "start copy rplidar.rules to  /etc/udev/rules.d/"
 echo "`rospack find rplidar_ros`/scripts/rplidar.rules"
 sudo cp rplidar.rules  /etc/udev/rules.d
+sudo cp 56-orbbec-usb.rules /etc/udev/rules.d
 echo " "
 echo "Restarting udev"
 echo ""
