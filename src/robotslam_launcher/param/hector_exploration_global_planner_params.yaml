@@ -5,7 +5,7 @@ hector_exploration_planner:
   # explore_close_to_path: 
   # use_inflated_obstacles: 
   # goal_angle_penalty: 
-  # min_frontier_size: 
+  min_frontier_size: 0.5 # 5
   # dist_for_goal_reached: 
   same_frontier_distance: 1 # 0.25
   # obstacle_cutoff_distance: 
