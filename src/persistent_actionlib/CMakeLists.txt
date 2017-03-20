@@ -121,6 +121,9 @@ include_directories(
 # add_library(persistent_actionlib
 #   src/${PROJECT_NAME}/persistent_actionlib.cpp
 # )
+add_library(persistent_actionlib
+        src/PersistentActionlib.cpp
+        src/PersistentActionServer.cpp src/PersistentActionServer.h)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -154,11 +157,11 @@ include_directories(
 # )
 
 ## Mark executables and/or libraries for installation
-#install(TARGETS persistent_actionlib persistent_actionlib_node
-#    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-#)
+install(TARGETS persistent_actionlib
+    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
