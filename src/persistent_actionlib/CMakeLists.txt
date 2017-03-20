@@ -5,7 +5,7 @@ project(persistent_actionlib)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  actionlib_msgs
+  actionlib
   roscpp
   std_msgs
 )
@@ -102,7 +102,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
     INCLUDE_DIRS include
     LIBRARIES persistent_actionlib
-#  CATKIN_DEPENDS actionlib_msgs roscpp std_msgs
+    CATKIN_DEPENDS actionlib actionlib_msgs roscpp std_msgs
 #  DEPENDS system_lib
 )
 
@@ -114,6 +114,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -122,8 +123,9 @@ include_directories(
 #   src/${PROJECT_NAME}/persistent_actionlib.cpp
 # )
 add_library(persistent_actionlib
-        src/PersistentActionlib.cpp
-        src/PersistentActionServer.cpp src/PersistentActionServer.h)
+        src/PersistentActionlibNode.cpp
+        src/PersistentActionServer.cpp
+        src/PersistentActionServer.h)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -131,16 +133,16 @@ add_library(persistent_actionlib
 # add_dependencies(persistent_actionlib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-# add_executable(persistent_actionlib_node src/persistent_actionlib_node.cpp)
+add_executable(persistent_actionlib_node src/PersistentActionlibNode.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(persistent_actionlib_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(persistent_actionlib_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(persistent_actionlib_node ${PROJECT_NAME}
+        ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##
