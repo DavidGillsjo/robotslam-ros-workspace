@@ -8,7 +8,6 @@ from sniffer import Sniffer
 from tf import (TransformListener, Exception)
 from geometry_msgs.msg import (Point)
 
-
 class WifiScanner:
     def __init__(self):
         rospy.init_node('wifi_scanner')

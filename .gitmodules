@@ -1,3 +1,6 @@
 [submodule "src/navigation_2d"]
 	path = src/navigation_2d
 	url = https://github.com/skasperski/navigation_2d
+[submodule "src/hector_navigation"]
+	path = src/hector_navigation
+	url = git@github.com:andenq/hector_navigation.git

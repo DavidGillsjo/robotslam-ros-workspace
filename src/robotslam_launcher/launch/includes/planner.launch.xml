@@ -19,6 +19,7 @@
     <rosparam file="$(find robotslam_launcher)/param/move_base_params.yaml" command="load" />
     <rosparam file="$(find robotslam_launcher)/param/global_planner_params.yaml" command="load" />
     <rosparam file="$(find robotslam_launcher)/param/navfn_global_planner_params.yaml" command="load" />
+    <rosparam file="$(find robotslam_launcher)/param/hector_exploration_global_planner_params.yaml" command="load" />
     <!-- external params file that could be loaded into the move_base namespace -->
     <!--<rosparam file="$(arg custom_param_file)" command="load" />-->
     

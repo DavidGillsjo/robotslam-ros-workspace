@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from scapy.all import *
 
-
 class Sniffer:
     def __init__(self, interface):
         # Radiotap field specification
@@ -59,5 +58,11 @@ class Sniffer:
                 # platform notdecoded was padded with a ton of zeros without
                 # indicating more fields in pkt.len and/or padding in pkt.pad
                 decoded = struct.unpack(fmt, pkt.notdecoded[:struct.calcsize(fmt)])
-                return pkt.addr2, decoded[rssipos]
+
+                as_hex = ''.join(x.encode('hex') for x in pkt.notdecoded)
+                rssi_hex = as_hex[44] + as_hex[45]
+                rssi = struct.unpack("b", rssi_hex.decode('hex'))
+
+                # return pkt.addr2, decoded[rssipos]
+                return pkt.addr2, rssi[0]
         return None, None
