@@ -18,10 +18,17 @@ class PersistentActionServer
 public:
     PersistentActionServer();
     void HandleActionlibCallback(const move_base_msgs::MoveBaseGoalConstPtr& goal);
+    void ClientDoneCallback(const actionlib::SimpleClientGoalState& state, const move_base_msgs::MoveBaseResultConstPtr& result);
+    void ClientActiveCallback();
+    void ClientFeedbackCallback(const move_base_msgs::MoveBaseFeedbackConstPtr& feedback);
 private:
-    ros::NodeHandle node_handle;
     Client client;
     Server server;
+    move_base_msgs::MoveBaseGoal goal;
+    bool running = false;
+
+    void SendCurrentGoal();
+    void CancelCurrentGoal();
 };
 
 

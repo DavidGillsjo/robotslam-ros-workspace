@@ -101,7 +101,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
     INCLUDE_DIRS include
-    LIBRARIES persistent_actionlib
+    LIBRARIES ${PROJECT_NAME}
     CATKIN_DEPENDS actionlib actionlib_msgs roscpp std_msgs
 #  DEPENDS system_lib
 )
@@ -123,7 +123,6 @@ include_directories(
 #   src/${PROJECT_NAME}/persistent_actionlib.cpp
 # )
 add_library(persistent_actionlib
-        src/PersistentActionlibNode.cpp
         src/PersistentActionServer.cpp
         src/PersistentActionServer.h)
 
@@ -159,7 +158,7 @@ target_link_libraries(persistent_actionlib_node ${PROJECT_NAME}
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS persistent_actionlib
+install(TARGETS persistent_actionlib persistent_actionlib_node
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
