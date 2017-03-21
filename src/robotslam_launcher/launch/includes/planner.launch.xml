@@ -9,6 +9,14 @@
   <!--<arg name="laser_topic" default="scan" />-->
   <!--<arg name="custom_param_file" default="$(find turtlebot_navigation)/param/dummy.yaml"/>-->
 
+  <!--
+  <include file="$(find robotslam_launcher)/launch/includes/gmapping/gmapping.launch.xml">
+    <arg name="map_topic" value="map_lowres" />
+    <arg name="resolution" value="0.25" />
+    <arg name="tf_name" value="tf_lowres" />
+  </include>
+  -->
+
   <node pkg="move_base" type="move_base" respawn="true" name="move_base" output="screen">
     <rosparam file="$(find robotslam_launcher)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find robotslam_launcher)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
