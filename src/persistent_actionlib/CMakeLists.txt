@@ -132,7 +132,7 @@ add_library(persistent_actionlib
 # add_dependencies(persistent_actionlib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-add_executable(persistent_actionlib_node src/PersistentActionlibNode.cpp)
+add_executable(persistent_actionlib_node src/PersistentActionlibNode.cpp src/PersistentActionServer.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above

@@ -9,7 +9,7 @@
   <!--<arg name="laser_topic" default="scan" />-->
   <!--<arg name="custom_param_file" default="$(find turtlebot_navigation)/param/dummy.yaml"/>-->
 
-  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+  <node pkg="move_base" type="move_base" respawn="true" name="move_base" output="screen">
     <rosparam file="$(find robotslam_launcher)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find robotslam_launcher)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find robotslam_launcher)/param/local_costmap_params.yaml" command="load" />
@@ -35,4 +35,6 @@
     <remap from="odom" to="$(arg odom_topic)"/>
     <!--<remap from="scan" to="$(arg laser_topic)"/>-->
   </node>
+
+  <node pkg="persistent_actionlib" type="persistent_actionlib_node" respawn="true" name="move_base_persistent" output="screen"/>
 </launch>
