@@ -1,0 +1,64 @@
+<launch>
+  <include file="$(find astra_launch)/launch/astra.launch">
+    <!--<arg name="scan_topic" value="scan_camera"/>-->
+  </include>
+
+  <node name="camera_info_clone" pkg="topic_tools" type="relay" args="/camera/depth/camera_info /camera_filtered/depth/camera_info">
+  </node>
+
+  <node name="median_filter" pkg="astra_filters" type="depth_image_filter_ros.py" output="screen">
+    <remap from="/image_raw" to="/camera/depth/image_raw"/>
+    <remap from="/image_filtered" to="/camera_filtered/depth/image_raw"/>
+  </node>
+
+  <arg name="manager" default="nodelet_manager" />
+
+  <arg name="respawn" default="false" />
+  <arg if="$(arg respawn)" name="bond" value="" />
+  <arg unless="$(arg respawn)" name="bond" value="--no-bond" />
+
+
+  <!-- TODO: Instead "rgb", "depth" and "depth_registered" should be remapped as
+       necessary by top-level launch file -->
+  <arg name="rgb"              default="rgb" />
+  <arg name="depth"            default="depth" />
+  <arg name="depth_registered" default="depth_registered" />
+  <arg name="depth_registration" default="false" />
+  <!-- For distinguishing multiple register/XYZRGB nodelets. Default fails if rgb
+       or depth contains a namespace. -->
+  <arg name="suffix" default="$(arg depth)_$(arg rgb)" />
+
+  <node pkg="nodelet" type="nodelet" name="$(arg manager)" args="manager"/>
+
+  <!-- Depth cloud only -->
+  <node pkg="nodelet" type="nodelet" name="points_xyz_$(arg suffix)"
+        args="load depth_image_proc/point_cloud_xyz $(arg manager) $(arg bond)"
+        respawn="$(arg respawn)">
+    <!--<remap from="rgb/image_rect_color"        to="$(arg rgb)/image_rect_color" />-->
+    <remap from="/camera_info" to="/camera/depth/camera_info" />
+    <remap from="/image_rect" to="/camera_filtered/depth/image_raw"/>
+    <remap from="/points" to="/camera_filtered/depth/points" />
+  </node>
+
+  <!-- Depth image projected unto RGB frame -->
+  <node pkg="nodelet" type="nodelet" name="register_$(arg suffix)"
+          args="load depth_image_proc/register $(arg manager) $(arg bond)"
+          respawn="$(arg respawn)">
+      <!-- Explicit topic remappings, shouldn't need all of these -->
+      <remap from="rgb/camera_info"              to="/camera/rgb/camera_info" />
+      <remap from="depth/camera_info"            to="/camera/depth/camera_info" />
+      <remap from="depth/image_rect"             to="/camera_filtered/depth/image_raw" />
+      <remap from="depth_registered/camera_info" to="/camera_filtered/depth_registered/camera_info"/>
+      <remap from="depth_registered/image_rect"  to="/camera_filtered/depth_registered/image_raw" />
+    </node>
+
+  <!-- Color depth cloud -->
+  <node pkg="nodelet" type="nodelet" name="points_xyzrgb_$(arg suffix)"
+        args="load depth_image_proc/point_cloud_xyzrgb $(arg manager) $(arg bond)"
+        respawn="$(arg respawn)">
+    <remap from="rgb/camera_info"             to="/camera_filtered/depth_registered/camera_info" />
+    <remap from="rgb/image_rect_color"        to="/camera/rgb/image_raw" />
+    <remap from="depth_registered/image_rect" to="/camera_filtered/depth_registered/image_raw"/>
+    <remap from="depth_registered/points"     to="/camera_filtered/rgb/points" />
+  </node>
+</launch>
