@@ -1,6 +1,6 @@
 [submodule "src/hector_navigation"]
 	path = src/hector_navigation
-	url = git@github.com:andenq/hector_navigation.git
+	url = git@github.com:coroiu/hector_navigation.git
 [submodule "src/slam_gmapping"]
 	path = src/slam_gmapping
-	url = git@github.com:andenq/slam_gmapping.git
+	url = git@github.com:coroiu/slam_gmapping.git
