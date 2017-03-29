@@ -7,4 +7,5 @@
   <include file="$(find robotslam_launcher)/launch/includes/gmapping/gmapping.launch.xml"/>
   <include file="$(find turtlebot_rviz_launchers)/launch/view_navigation.launch"/>
   <include file="$(find robotslam_launcher)/launch/includes/planner.launch.xml"/>
+  <include file="$(find robotslam_launcher)/launch/includes/websocket.launch.xml"/>
 </launch>
