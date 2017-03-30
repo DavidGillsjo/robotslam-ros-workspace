@@ -1,4 +1,5 @@
 <launch>
   <include file="$(find robotslam_launcher)/launch/demo/office_gazebo.launch"/>
+  <include file="$(find robotslam_launcher)/launch/includes/wifi_scanner.launch.xml"/>
   <include file="$(find robotslam_launcher)/launch/gmapping.launch"/>
 </launch>

@@ -1,0 +1,3 @@
+<launch>
+  <node name="wifi_scanner" pkg="wifi_scanner" type="scanner.py" output="screen"/>
+</launch>

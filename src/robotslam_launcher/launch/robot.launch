@@ -1,5 +1,6 @@
 <launch>
   <include file="$(find robotslam_launcher)/launch/includes/rplidar.launch.xml"/>
+  <include file="$(find robotslam_launcher)/launch/includes/wifi_scanner.launch.xml"/>
   <include file="$(find robotslam_launcher)/launch/includes/bringup.launch.xml"/>
 
   <!--<include file="$(find robotslam_launcher)/launch/includes/velocity_smoother.launch.xml"/>-->

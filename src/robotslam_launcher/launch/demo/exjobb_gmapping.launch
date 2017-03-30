@@ -3,5 +3,6 @@
     <arg name="map_file" value="$(find robotslam_launcher)/worlds/mhuset2_halfsize.yaml"/>
     <arg name="world_file" value="$(find robotslam_launcher)/worlds/mhuset2_halfsize.world"/>
   </include>
+  <include file="$(find robotslam_launcher)/launch/includes/wifi_scanner.launch.xml"/>
   <include file="$(find robotslam_launcher)/launch/includes/gmapping/gmapping.launch.xml"/>
 </launch>
