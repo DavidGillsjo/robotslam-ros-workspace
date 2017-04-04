@@ -1,0 +1,4 @@
+<launch>
+  <include file="$(find robotslam_launcher)/launch/robot.launch"/>
+  <include file="$(find robotslam_launcher)/launch/gmapping.launch"/>
+</launch>
