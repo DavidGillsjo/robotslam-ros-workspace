@@ -31,8 +31,9 @@ RUN rosdep update && \
     rosdep install --from-paths src --ignore-src -y -r
 
 # Build and install.
-RUN source "/opt/ros/kinetic/setup.bash"
-RUN catkin_make_isolated --install --use-ninja
+SHELL ["/bin/bash", "-c"]
+RUN source "/opt/ros/kinetic/setup.bash" &&\
+    catkin_make_isolated --install --use-ninja
 
 # Sourcing this before .bashrc runs breaks ROS completions
 RUN echo "\nsource /home/ros/install_isolated/setup.bash" >> "/home/${user}/.bashrc"
