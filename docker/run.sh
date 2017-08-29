@@ -3,7 +3,7 @@ XSOCK=/tmp/.X11-unix
 XAUTH=/tmp/.docker.xauth
 touch $XAUTH
 xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
-set -x
+
 if [[ ${USE_NVIDIA} == 1 ]] ; then
   DOCKER_CMD="nvidia-docker"
   DOCKER_OPT=""
@@ -20,5 +20,4 @@ fi;
         --env="DISPLAY" \
         -v "host_home:$HOME:rw"\
     robotslam
-
-set +x
+    
