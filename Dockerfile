@@ -26,6 +26,9 @@ RUN export uid="${uid}" gid="${gid}" && \
     passwd -d "${user}" && \
     usermod -aG sudo "${user}"
 
+# Enable access to graphics HW
+RUN adduser "${user}" video
+
 WORKDIR "/ros"
 
 # Copy the current directory contents into the container
