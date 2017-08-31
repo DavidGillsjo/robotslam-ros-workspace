@@ -21,7 +21,7 @@ source install_isolated/setup.bash
 
 We start by bringing up the map.
 ```bash
-roslaunch turtlebot_gazebo turtlebot_world.launch world_file:=worlds/willowgarage.world
+WORLD_FILE=worlds/willowgarage.world roslaunch turtlebot_gazebo turtlebot_world.launch
 ```
 
 Which launches the turtlebot gazebo instance with turtlebot_world launch file and the "office" world.
