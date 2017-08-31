@@ -21,5 +21,5 @@ fi;
         --volume=$XSOCK:$XSOCK:rw \
         --env="QT_X11_NO_MITSHM=1" \
         --env="DISPLAY" \
-        -v "host_home:$HOME:rw"\
+        -v "$HOME:/$HOME:rw"\
     robotslam

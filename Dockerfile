@@ -4,17 +4,18 @@ FROM osrf/ros:kinetic-desktop-full
 ARG user=ros
 ARG uid=1000
 ARG gid=1000
-ARG USE_NVIDIA=0
 
-RUN apt-get update
 #Build tools and other
-RUN apt-get install sudo git python-wstool python-rosdep ninja-build -y
+RUN apt-get update && \
+    apt-get install sudo git python-wstool python-rosdep ninja-build zsh -y
 
 # Intel Graphics support
-RUN apt-get -y install libgl1-mesa-glx libgl1-mesa-dri
+RUN apt-get update && \
+    apt-get -y install libgl1-mesa-glx libgl1-mesa-dri
 
 #Turtlebot packages
-RUN apt-get install ros-kinetic-turtlebot ros-kinetic-turtlebot-apps \
+RUN apt-get update && \
+    apt-get install ros-kinetic-turtlebot ros-kinetic-turtlebot-apps \
                     ros-kinetic-turtlebot-interactions ros-kinetic-turtlebot-simulator \
                     ros-kinetic-kobuki-ftdi -y
 
@@ -42,12 +43,12 @@ RUN rosdep update && \
     rosdep install --from-paths src --ignore-src -y -r
 
 # Build and install.
-SHELL ["/bin/bash", "-c"]
-RUN source "/opt/ros/kinetic/setup.bash" &&\
+SHELL ["/bin/zsh", "-c"]
+RUN source "/opt/ros/kinetic/setup.zsh" &&\
     catkin_make_isolated --install --use-ninja
 
-# Sourcing this before .bashrc runs breaks ROS completions
-RUN echo "source /ros/devel_isolated/setup.bash" >> "/home/${user}/.bashrc"
+#May be used later for deployment
+#RUN echo "source /ros/devel_isolated/setup.zsh" >> "/home/${user}/.zshrc"
 
 #Nvidia support
 LABEL com.nvidia.volumes.needed="nvidia_driver"
@@ -57,5 +58,6 @@ ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64:${LD_LIBRARY_P
 # Make SSH available
 EXPOSE 22
 
+RUN sudo rm -rf /var/lib/apt/lists/*
 # Mount the user's home directory
-VOLUME "/host_home"
+VOLUME "/home/${user}"
