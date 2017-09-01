@@ -19,6 +19,10 @@ RUN apt-get update && \
                     ros-kinetic-turtlebot-interactions ros-kinetic-turtlebot-simulator \
                     ros-kinetic-kobuki-ftdi -y
 
+# Move a launch file so that gazebo can find it
+RUN cp /opt/ros/kinetic/share/turtlebot_navigation/launch/includes/gmapping/gmapping.launch.xml \
+       /opt/ros/kinetic/share/turtlebot_navigation/launch/includes/
+
 # Clone user to container, necessary to get X server access.
 RUN export uid="${uid}" gid="${gid}" && \
     groupadd -g "${gid}" "${user}" && \
@@ -61,8 +65,10 @@ ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64:${LD_LIBRARY_P
 # Make SSH available
 EXPOSE 22
 
+# Reduce image size
 RUN sudo rm -rf /var/lib/apt/lists/*
 
-CMD ["bash", "-c"]
+CMD ["bash"]
+
 # Mount the user's home directory
 VOLUME "/host_home"
