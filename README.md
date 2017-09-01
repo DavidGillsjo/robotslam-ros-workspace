@@ -17,6 +17,22 @@ catkin_make_isolated --install --use-ninja
 source install_isolated/setup.bash
 ```
 
+## Building the docker image
+1. Install docker (and nvidia-docker if you have a nvidia GPU)
+2. From repo root: `cd docker`
+3. `./build.sh`
+4. Wait until finished, it may take some time...
+
+## Using the docker image
+1. `cd docker`
+2. Simplest form: `./run`.
+..* To use your nvidia card, add the option `USE_NVIDIA=1`.
+..* If you want to mount another directory than you home, use `HOME=<path_to_mount>`.
+..* I.e. `USE_NVIDIA=1 HOME=<path_to_mount> ./run.sh`
+3. To attach more terminals to the container, use `./attach.sh <container_name>`.
+Which will be `robotslam_intel` or `robotslam_nvidia`.
+4. Once inside, run `source install_isolated/setup.bash` and you're ready to go.
+
 ## TurtleBot Office Mapping
 
 We start by bringing up the map.
