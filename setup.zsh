@@ -1,3 +1,4 @@
+#!/bin/zsh
 export TURTLEBOT_3D_SENSOR="astra"
 source ./install_isolated/setup.zsh
 # source ./devel_isolated/setup.zsh

@@ -62,5 +62,7 @@ ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64:${LD_LIBRARY_P
 EXPOSE 22
 
 RUN sudo rm -rf /var/lib/apt/lists/*
+
+CMD ["zsh"]
 # Mount the user's home directory
 VOLUME "/home/${user}"

@@ -5,4 +5,4 @@ if [[ "$1" == *"nvidia"* ]]; then
 else
   DOCKER_CMD="docker"
 fi
-${DOCKER_CMD} exec -i -t "$1" /bin/bash
+${DOCKER_CMD} exec -i -t "$1" /bin/zsh
