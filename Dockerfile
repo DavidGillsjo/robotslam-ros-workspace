@@ -46,8 +46,8 @@ RUN rosdep update && \
     rosdep install --from-paths src --ignore-src -y -r
 
 # Build and install.
-SHELL ["/bin/zsh", "-c"]
-RUN source "/opt/ros/kinetic/setup.zsh" &&\
+SHELL ["/bin/bash", "-c"]
+RUN source "/opt/ros/kinetic/setup.bash" &&\
     catkin_make_isolated --install --use-ninja
 
 #May be used later for deployment
@@ -63,6 +63,6 @@ EXPOSE 22
 
 RUN sudo rm -rf /var/lib/apt/lists/*
 
-CMD ["zsh"]
+CMD ["bash", "-c"]
 # Mount the user's home directory
-VOLUME "/home/${user}"
+VOLUME "/host_home"
