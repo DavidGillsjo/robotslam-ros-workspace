@@ -1,6 +1,6 @@
 <launch>
   <arg name="scan_topic" default="laser_filtered"/>
-  
+
   <include file="$(find robotslam_launcher)/launch/includes/transform.xml"/>
   <node name="laser_filter" pkg="turtlebot_navigation" type="laser_footprint_filter"/>
 
@@ -16,6 +16,9 @@
         output="screen">
     <remap from="laser_scan" to="$(arg scan_topic)"/>
   </node>
+
+  <node name="cartographer_occupancy_grid_node" pkg="cartographer_ros"
+        type="cartographer_occupancy_grid_node" args="-resolution 0.1" />
 
   <node name="flat_world_imu_node" pkg="cartographer_turtlebot"
         type="cartographer_flat_world_imu_node" output="screen">
