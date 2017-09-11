@@ -17,7 +17,11 @@ RUN apt-get update && \
 RUN apt-get update && \
     apt-get install ros-kinetic-turtlebot ros-kinetic-turtlebot-apps \
                     ros-kinetic-turtlebot-interactions ros-kinetic-turtlebot-simulator \
-                    ros-kinetic-kobuki-ftdi -y
+                    ros-kinetic-kobuki-ftdi ros-kinetic-frontier-exploration -y
+
+# Rosbridge for server communication
+RUN apt-get update && \
+    apt-get install ros-kinetic-rosbridge-server -y
 
 # Move a launch file so that gazebo can find it
 RUN cp /opt/ros/kinetic/share/turtlebot_navigation/launch/includes/gmapping/gmapping.launch.xml \
@@ -35,12 +39,14 @@ RUN adduser "${user}" video
 
 WORKDIR "/ros"
 
-# Copy the current directory contents into the container
+# Add whole repository for build.
 ADD . "/ros"
 
 # Update repositories
 RUN wstool merge -t src https://raw.githubusercontent.com/googlecartographer/cartographer_turtlebot/master/cartographer_turtlebot.rosinstall
 RUN wstool update -t src --delete-changed-uris
+RUN git submodule update --init ./src/slam_gmapping
+RUN git submodule update --init ./src/hector_navigation
 RUN chown -R "${user}:${user}" "/ros"
 
 USER "${user}"

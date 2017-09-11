@@ -21,5 +21,6 @@ fi;
         --volume=$XSOCK:$XSOCK:rw \
         --env="QT_X11_NO_MITSHM=1" \
         --env="DISPLAY" \
-        -v "$HOME:/$HOME:rw"\
+        -v "${HOME}:/host_home:rw"\
+        "$@"\
     robotslam
