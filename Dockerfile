@@ -78,3 +78,4 @@ CMD ["bash"]
 
 # Mount the user's home directory
 VOLUME "/host_home"
+VOLUME "/rosbag"
