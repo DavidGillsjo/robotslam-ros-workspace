@@ -59,3 +59,11 @@ install_isolated/
 *cmake-build-debug
 
 experiments/matlab2tikz
+
+# From .rosinstall file
+src/cartographer
+src/cartographer_turtlebot
+src/cartographer_ros
+src/ceres-solver
+src/hector_navigation
+src/slam_gmapping

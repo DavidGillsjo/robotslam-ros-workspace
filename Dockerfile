@@ -43,10 +43,7 @@ WORKDIR "/ros"
 ADD . "/ros"
 
 # Update repositories
-RUN wstool merge -t src https://raw.githubusercontent.com/googlecartographer/cartographer_turtlebot/master/cartographer_turtlebot.rosinstall
 RUN wstool update -t src --delete-changed-uris
-RUN git submodule update --init ./src/slam_gmapping
-RUN git submodule update --init ./src/hector_navigation
 RUN chown -R "${user}:${user}" "/ros"
 
 USER "${user}"
