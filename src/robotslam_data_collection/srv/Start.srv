@@ -1,0 +1,16 @@
+# Map, leave empty to run exploration
+nav_msgs/OccupancyGrid map
+
+# Name of the measurement
+string name
+
+# String of topics to record
+string[] topics
+
+# Store rosbag on robot PC
+bool store_rosbag
+
+---
+
+bool success
+string message
