@@ -1,9 +1,0 @@
-[submodule "src/hector_navigation"]
-	path = src/hector_navigation
-	url = git@github.com:coroiu/hector_navigation.git
-[submodule "src/slam_gmapping"]
-	path = src/slam_gmapping
-	url = git@github.com:coroiu/slam_gmapping.git
-[submodule "src/cartographer_ros"]
-	path = src/cartographer_ros
-	url = git@github.com:hinton/cartographer_ros.git
