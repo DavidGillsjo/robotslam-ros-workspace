@@ -61,6 +61,7 @@ install_isolated/
 experiments/matlab2tikz
 
 # From .rosinstall file
+.rosinstall.bak
 src/cartographer
 src/cartographer_turtlebot
 src/cartographer_ros
