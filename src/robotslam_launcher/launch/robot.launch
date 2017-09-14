@@ -5,4 +5,5 @@
 
   <!--<include file="$(find robotslam_launcher)/launch/includes/velocity_smoother.launch.xml"/>-->
   <include file="$(find robotslam_launcher)/launch/includes/safety_controller.launch.xml"/>
+  <include file="$(find robotslam_launcher)/launch/includes/websocket.launch.xml"/>
 </launch>

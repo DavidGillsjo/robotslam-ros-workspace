@@ -17,4 +17,5 @@
     <arg name="initial_pose_y" default="-0.4"/>
     <arg name="initial_pose_a" default="0.0"/>
   </include>
+  <include file="$(find robotslam_launcher)/launch/includes/websocket.launch.xml"/>
 </launch>

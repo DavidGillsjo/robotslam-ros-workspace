@@ -1,6 +1,6 @@
 <launch>
   <arg name="scan_topic" default="laser_filtered"/>
-  
+
   <include file="$(find robotslam_launcher)/launch/includes/transform.xml"/>
   <node name="laser_filter" pkg="turtlebot_navigation" type="laser_footprint_filter"/>
 
@@ -9,5 +9,4 @@
   </include>
   <include file="$(find turtlebot_rviz_launchers)/launch/view_navigation.launch"/>
   <include file="$(find robotslam_launcher)/launch/includes/planner.launch.xml"/>
-  <include file="$(find robotslam_launcher)/launch/includes/websocket.launch.xml"/>
 </launch>
