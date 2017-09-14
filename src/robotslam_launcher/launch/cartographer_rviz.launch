@@ -1,0 +1,8 @@
+<launch>
+  <include file="$(find robotslam_launcher)/launch/cartographer.launch"/>
+
+  <!--<node name="rviz" pkg="rviz" type="rviz" required="true"
+      args="-d $(find robotslam_launcher
+          )/configs/demo_turtlebot_cartographer.rviz"/>-->
+  <include file="$(find turtlebot_rviz_launchers)/launch/view_navigation.launch"/>
+</launch>

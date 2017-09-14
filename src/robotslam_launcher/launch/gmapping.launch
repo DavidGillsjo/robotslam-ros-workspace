@@ -5,6 +5,6 @@
   <node name="laser_filter" pkg="turtlebot_navigation" type="laser_footprint_filter"/>
 
   <include file="$(find robotslam_launcher)/launch/includes/gmapping/gmapping.launch.xml"/>
-  <include file="$(find turtlebot_rviz_launchers)/launch/view_navigation.launch"/>
+
   <include file="$(find robotslam_launcher)/launch/includes/planner.launch.xml"/>
 </launch>

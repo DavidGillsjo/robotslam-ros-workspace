@@ -2,5 +2,5 @@
   <!--<param name="/use_sim_time" value="true" />-->
 
   <include file="$(find robotslam_launcher)/launch/demo/office_gazebo.launch"/>
-  <include file="$(find robotslam_launcher)/launch/cartographer.launch"/>
+  <include file="$(find robotslam_launcher)/launch/cartographer_rviz.launch"/>
 </launch>
