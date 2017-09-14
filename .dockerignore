@@ -4,3 +4,9 @@ install
 build_isolated
 devel_isolated
 install_isolated
+src/cartographer
+src/cartographer_turtlebot
+src/cartographer_ros
+src/ceres-solver
+src/hector_navigation
+src/slam_gmapping
