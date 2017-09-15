@@ -1,0 +1,4 @@
+<launch>
+  <include file="$(find robotslam_launcher)/launch/cartographer.launch"/>
+  <include file="$(find robotslam_launcher)/launch/exploration.launch"/>
+</launch>
