@@ -41,6 +41,8 @@ WORKDIR "/ros"
 
 # Add whole repository for build.
 ADD . "/ros"
+# Entrypoint
+ADD "./docker/ros_entrypoint.sh" "/ros_entrypoint.sh"
 
 # Update repositories
 RUN wstool update -t src --delete-changed-uris
@@ -57,9 +59,6 @@ SHELL ["/bin/bash", "-c"]
 RUN source "/opt/ros/kinetic/setup.bash" &&\
     catkin_make_isolated --install --use-ninja
 
-#May be used later for deployment
-#RUN echo "source /ros/devel_isolated/setup.zsh" >> "/home/${user}/.zshrc"
-
 #Nvidia support
 LABEL com.nvidia.volumes.needed="nvidia_driver"
 ENV PATH /usr/local/nvidia/bin:${PATH}
@@ -71,7 +70,8 @@ EXPOSE 22
 # Reduce image size
 RUN sudo rm -rf /var/lib/apt/lists/*
 
-CMD ["bash"]
+# Run robot base launch as default
+CMD ["roslaunch", "robotslam_launcher", "robot_3dsensor.launch"]
 
 # Mount the user's home directory
 VOLUME "/host_home"
