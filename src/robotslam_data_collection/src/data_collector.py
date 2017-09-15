@@ -10,6 +10,7 @@ import rosbag
 import subprocess
 
 import rospy
+import rospkg
 
 class CollectionMode:
     IDLE = 0
@@ -17,15 +18,19 @@ class CollectionMode:
     EXPLORING = 2
     COVERAGE = 3
 
-def launchPackage(package, executable, env = []):
-    node = roslaunch.core.Node(package, executable, env_args=env)
+def launchPackage(package, rel_file_path, env = []):
+    rospack = rospkg.RosPack()
+    package_path = rospack.get_path(package)
+    full_path = os.path.join(package_path, rel_file_path)
+    print(full_path)
 
-    launch = roslaunch.scriptapi.ROSLaunch()
+    uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+    roslaunch.configure_logging(uuid)
+    launch = roslaunch.parent.ROSLaunchParent(uuid, [full_path])
+
     launch.start()
 
-    process = launch.launch(node)
-
-    return process
+    return launch
 
 class StoppableThread(Thread):
     def __init__(self, target, args):
@@ -88,14 +93,14 @@ class DataCollector:
         if req.map == None:
             # Exploration
             msg = ""
-            self.launch_handle = launchPackage("robotslam_launcher",
-                                               "cartographer_exploration")
+            self.launch_handle = launchPackage(u"robotslam_launcher",
+                                               u"launch/cartographer_exploration.launch")
             self.mode = CollectionMode.EXPLORING
         else:
             # Coverage
             msg = "Coverage is not yet implemented, running exploration."
-            self.launch_handle = launchPackage("robotslam_launcher",
-                                               "cartographer_exploration")
+            self.launch_handle = launchPackage(u"robotslam_launcher",
+                                               u"launch/cartographer_exploration.launch")
             self.mode = CollectionMode.EXPLORING
 
         if req.store_rosbag:
@@ -131,7 +136,7 @@ class DataCollector:
 
         # Stop processes
         if self.launch_handle:
-            self.launch_handle.stop()
+            self.launch_handle.shutdown()
 
         if self.bag_thread:
             self.bag_thread.stop()
