@@ -5,4 +5,5 @@
   </include>
   <include file="$(find robotslam_launcher)/launch/includes/bringup.launch.xml"/>
   <include file="$(find robotslam_launcher)/launch/includes/websocket.launch.xml"/>
+  <include file="$(find robotslam_launcher)/launch/includes/data_collector.launch.xml"/>
 </launch>

@@ -1,0 +1,3 @@
+<launch>
+  <node name="data_collector" pkg="robotslam_data_collection" type="data_collector.py" output="screen"/>
+</launch>
