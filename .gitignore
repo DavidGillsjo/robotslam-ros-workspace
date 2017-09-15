@@ -68,3 +68,4 @@ src/cartographer_ros
 src/ceres-solver
 src/hector_navigation
 src/slam_gmapping
+src/rplidar_ros
