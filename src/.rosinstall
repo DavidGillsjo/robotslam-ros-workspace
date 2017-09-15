@@ -17,3 +17,6 @@
 - git:
     local-name: slam_gmapping
     uri: https://github.com/Robotslam/slam_gmapping.git
+- git:
+    local-name: rplidar_ros
+    uri: https://github.com/robopeak/rplidar_ros.git
