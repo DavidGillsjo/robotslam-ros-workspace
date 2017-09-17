@@ -8,7 +8,8 @@ from multiprocessing import Process
 import roslaunch
 from datetime import datetime
 import rosbag
-import subprocess
+from subprocess import Popen
+import signal
 
 import rospy
 import rospkg
@@ -37,9 +38,12 @@ def launchPackage(package, rel_file_path, env = []):
 
     return launch
 
-def rosbagWithCb(path, topics, callback_fn):
-    rcode = subprocess.call(["rosbag", "record", "-O", path, "--lz4"] + topics)
-    callback_fn(rcode)
+def terminate_process_and_children(p):
+  import psutil
+  process = psutil.Process(p.pid)
+  for sub_process in process.children(recursive=True):
+      sub_process.send_signal(signal.SIGINT)
+  p.wait()  # we wait for children to terminate
 
 class DataCollector:
 
@@ -138,11 +142,14 @@ class DataCollector:
             self.startBag(self.req.topics)
 
     def startBag(self, topics):
+        if self.bag_thread != None:
+            rospy.loginfo("Rosbag already running, killing previous rosbag.")
+            self.killRosbag()
+
         #Use directory name as filename
         bagpath = os.path.join(self.data_dir, "{}.bag".format(os.path.basename(self.data_dir)))
-        self.bag_thread = Process(target=rosbagWithCb, args=(bagpath, topics, self.bagCb))
-        self.bag_thread.start()
-        rospy.loginfo("Rosbag started")
+        self.bag_thread = Popen(["rosbag", "record", "-O", bagpath, "--lz4"] + topics)
+        rospy.loginfo("Rosbag started, recording to {}".format(bagpath))
 
     def bagCb(self,rcode):
         rospy.loginfo("Rosbag exited")
@@ -180,10 +187,7 @@ class DataCollector:
             self.launch_handle = None
 
         rospy.loginfo("---Stopping bag")
-        if self.bag_thread:
-            self.bag_thread.terminate()
-            #self.bag_thread.join()
-            self.bag_thread = None
+        self.killRosbag()
 
         # Restore mode
         rospy.loginfo("---restore mode")
@@ -193,13 +197,13 @@ class DataCollector:
         if not forced:
             self.lock.release()
 
-    def publish_status(self):
+    def publishStatus(self):
         if self.mode != CollectionMode.ERROR:
             self.pub.publish(self.status_msgs[self.mode])
         else:
             self.pub.publish(self.error_msg)
 
-    def state_transition(self):
+    def stateTransition(self):
         if ( self.mode == CollectionMode.INITIATE_COVERAGE or
              self.mode == CollectionMode.INITIATE_EXPLORING ):
             try:
@@ -212,11 +216,25 @@ class DataCollector:
                self.mode == CollectionMode.STOP ):
             self.stopCollection()
 
+    def manageRosbag(self):
+        # Make sure it is alive if it exists
+        if self.bag_thread != None:
+            rcode = self.bag_thread.poll()
+            if rcode != None:
+                self.mode = CollectionMode.ERROR
+                self.error_msg = "Rosbag terminated early with error code {}".format(rcode)
+
+    def.killRosbag(self):
+        if self.bag_thread:
+            terminate_process_and_children(self.bag_thread)
+            self.bag_thread = None
+
     def run(self):
         rate = rospy.Rate(1) # 1hz
         while not rospy.is_shutdown():
-            self.state_transition()
-            self.publish_status()
+            self.stateTransition()
+            self.manageRosbag()
+            self.publishStatus()
             rate.sleep()
 
     def shutdown(self):
