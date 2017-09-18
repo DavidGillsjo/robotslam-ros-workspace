@@ -24,6 +24,7 @@ fi;
         --network=${NETWORK-bridge}\
         --env="QT_X11_NO_MITSHM=1" \
         --env="DISPLAY" \
+        --env="TZ=Europe/Stockholm" \
         -v "${HOME}:/host_home:rw"\
         -v "${ROSBAG-/tmp/rosbag}:/rosbag:rw"\
         robotslam "$@"
