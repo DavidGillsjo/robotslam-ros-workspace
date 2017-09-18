@@ -227,7 +227,7 @@ class DataCollector:
         timeout = False
         try:
             traj = rospy.wait_for_message("/trajectory_node_list", MarkerArray, timeout = 10)
-        except ROSException:
+        except rospy.ROSException:
             timeout = True
             self.mode = CollectionMode.ERROR
             self.error_msg = "No trajectory published on topic /trajectory_node_list"
