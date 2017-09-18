@@ -2,6 +2,16 @@
   <include file="$(find robotslam_launcher)/launch/includes/rplidar.launch.xml"/>
   <include file="$(find turtlebot_bringup)/launch/3dsensor.launch">
     <arg name="scan_topic" value="scan_camera"/>
+    <!-- Disable depth registration -->
+    <arg name="depth_registration"              value="false"/>
+    <!-- Disable most of the processing modules -->
+    <arg name="rgb_processing"                  value="true"/>
+    <arg name="ir_processing"                   value="false"/>
+    <arg name="depth_processing"                value="false"/>
+    <arg name="depth_registered_processing"     value="false"/>
+    <arg name="disparity_processing"            value="false"/>
+    <arg name="disparity_registered_processing" value="false"/>
+    <arg name="scan_processing"                 value="false"/>
   </include>
   <include file="$(find robotslam_launcher)/launch/includes/bringup.launch.xml"/>
   <include file="$(find robotslam_launcher)/launch/includes/websocket.launch.xml"/>
