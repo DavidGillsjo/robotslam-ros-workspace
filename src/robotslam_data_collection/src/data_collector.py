@@ -3,25 +3,27 @@ import os
 from robotslam_data_collection.srv import Start, StartResponse
 from std_srvs.srv import Trigger, TriggerResponse
 from std_msgs.msg import String
-from threading import RLock
+from threading import RLock, Timer
 from multiprocessing import Process
 import roslaunch
 from datetime import datetime
 import rosbag
-from subprocess import Popen
+import subprocess
 import signal
+from visualization_msgs.msg import MarkerArray
 
 import rospy
 import rospkg
 
 class CollectionMode:
     IDLE = 0
-    ERROR = 1
-    INITIATE_EXPLORING = 2
-    INITIATE_COVERAGE = 3
-    EXPLORING = 4
-    COVERAGE = 5
-    STOP = 6
+    IDLE_ERROR = 1
+    ERROR = 2
+    INITIATE_EXPLORING = 3
+    INITIATE_COVERAGE = 4
+    EXPLORING = 5
+    COVERAGE = 6
+    STOP = 7
 
 def launchPackage(package, rel_file_path, env = []):
     rospack = rospkg.RosPack()
@@ -45,12 +47,25 @@ def terminate_process_and_children(p):
       sub_process.send_signal(signal.SIGINT)
   p.wait()  # we wait for children to terminate
 
+def killProc(proc, timeout):
+    timeout["value"] = True
+    proc.kill()
+
+def writeTrajectory(path, traj_msg):
+    with open(path, "wb") as f:
+        twriter = csv.writer(f, delimiter=',')
+        twriter.writerow(["version", "1"])
+        for p in traj_msg.points:
+            twriter.writerow([str(p.x), str(p.y)])
+
+
 class DataCollector:
 
     def __init__(self):
         rospy.init_node('data_collector')
 
         self.status_msgs = ["Idle",
+                            "Error",
                             "Error",
                             "Initating exploration...",
                             "Initiating coverage...",
@@ -64,7 +79,8 @@ class DataCollector:
         self.bag_thread = None
         self.req = None                         # Incoming service message
         self.req_timeout = rospy.Duration(30)   # Request timeout
-        
+        self.data_dir = None
+
         rospy.on_shutdown(self.shutdown)
 
         # Services
@@ -79,14 +95,14 @@ class DataCollector:
 
         if self.mode <= CollectionMode.ERROR:
             self.req = req
-            init_mode = (CollectionMode.INITIATE_COVERAGE if req.map 
+            init_mode = (CollectionMode.INITIATE_COVERAGE if req.map
                          else CollectionMode.INITIATE_EXPLORING)
             self.mode = init_mode
-            
+
             # Wait until complete or failed
             rate = rospy.Rate(5)
             start_t = rospy.Time.now()
-            while ( self.mode == init_mode and 
+            while ( self.mode == init_mode and
                     (rospy.Time.now() - start_t) < self.req_timeout ):
                 rate.sleep()
 
@@ -148,16 +164,8 @@ class DataCollector:
 
         #Use directory name as filename
         bagpath = os.path.join(self.data_dir, "{}.bag".format(os.path.basename(self.data_dir)))
-        self.bag_thread = Popen(["rosbag", "record", "-O", bagpath, "--lz4"] + topics)
+        self.bag_thread = subprocess.Popen(["rosbag", "record", "-O", bagpath, "--lz4"] + topics)
         rospy.loginfo("Rosbag started, recording to {}".format(bagpath))
-
-    def bagCb(self,rcode):
-        rospy.loginfo("Rosbag exited")
-        if rcode != 0:
-            rospy.loginfo("Rosbag failed, enter error mode")
-            self.lock.acquire()
-            self.mode = CollectionMode.ERROR
-            self.lock.release()
 
     def handleEnd(self, req):
         # Stop recording
@@ -165,7 +173,7 @@ class DataCollector:
         # Wait until complete or failed
         rate = rospy.Rate(5)
         start_t = rospy.Time.now()
-        while ( self.mode == CollectionMode.STOP and 
+        while ( self.mode == CollectionMode.STOP and
                 (rospy.Time.now() - start_t) < self.req_timeout ):
             rate.sleep()
 
@@ -178,7 +186,10 @@ class DataCollector:
         rospy.loginfo("Stopping data collection")
         if not forced:
             self.lock.acquire()
-        # Store map etc?
+
+        # Store map and stuff
+        self.saveTrajectory()
+        self.saveMap()
 
         # Stop processes
         rospy.loginfo("---Stopping launch")
@@ -191,14 +202,47 @@ class DataCollector:
 
         # Restore mode
         rospy.loginfo("---restore mode")
-        if self.mode != CollectionMode.ERROR:
+        if self.mode == CollectionMode.ERROR:
+            self.mode = CollectionMode.IDLE_ERROR
+        else:
             self.mode = CollectionMode.IDLE
 
         if not forced:
             self.lock.release()
 
+    def saveMap(self):
+        # Give map saver 10 seconds to save the map.
+        map_path = os.path.join(self.data_dir, os.path.basename(self.data_dir))
+        proc = subprocess.Popen(["rosrun", "map_server", "map_saver", "-f", map_path])
+        timeout = {"value": False}
+        timer = Timer(10, killProc, [proc, timeout])
+        timer.start()
+        stdout,stderr = proc.communicate()
+        timer.cancel()
+        if timeout["value"]:
+            self.mode = CollectionMode.ERROR
+            self.error_msg = "Could not save map"
+
+    def saveTrajectory(self):
+        timeout = False
+        try:
+            traj = rospy.wait_for_message("/trajectory_node_list", MarkerArray, timeout = 10)
+        except ROSException:
+            timeout = True
+            self.mode = CollectionMode.ERROR
+            self.error_msg = "No trajectory published on topic /trajectory_node_list"
+
+        if not timeout:
+            try:
+                traj_path = os.path.join(self.data_dir, "traj.csv")
+                writeTrajectory(traj_path, traj)
+            except Exception:
+                self.mode = CollectionMode.ERROR
+                self.error_msg = "Could not write trajectory"
+
     def publishStatus(self):
-        if self.mode != CollectionMode.ERROR:
+        if ( self.mode != CollectionMode.ERROR and
+             self.mode != CollectionMode.IDLE_ERROR ):
             self.pub.publish(self.status_msgs[self.mode])
         else:
             self.pub.publish(self.error_msg)
@@ -211,8 +255,8 @@ class DataCollector:
             except Exception as e:
                 self.error_msg = str(e)
                 raise e
-        
-        elif ( self.mode == CollectionMode.ERROR or 
+
+        elif ( self.mode == CollectionMode.ERROR or
                self.mode == CollectionMode.STOP ):
             self.stopCollection()
 
@@ -221,10 +265,12 @@ class DataCollector:
         if self.bag_thread != None:
             rcode = self.bag_thread.poll()
             if rcode != None:
+                rospy.loginfo("Rosbag terminated for unkown reason, stopping...")
+                self.bag_thread = None
                 self.mode = CollectionMode.ERROR
                 self.error_msg = "Rosbag terminated early with error code {}".format(rcode)
 
-    def.killRosbag(self):
+    def killRosbag(self):
         if self.bag_thread:
             terminate_process_and_children(self.bag_thread)
             self.bag_thread = None
@@ -239,7 +285,7 @@ class DataCollector:
 
     def shutdown(self):
         rospy.loginfo("Shutting down")
-        if ( self.mode == CollectionMode.EXPLORING or 
+        if ( self.mode == CollectionMode.EXPLORING or
              self.mode == CollectionMode.COVERAGE ):
             self.stopCollection(forced=True)
 
