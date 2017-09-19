@@ -1,4 +1,4 @@
-FROM osrf/ros:kinetic-desktop-full
+FROM osrf/ros:kinetic-desktop-full-xenial
 
 # Arguments
 ARG user=ros
