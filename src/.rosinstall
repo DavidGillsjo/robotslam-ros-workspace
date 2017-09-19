@@ -13,7 +13,8 @@
     version: 1.12.0
 - git:
     local-name: hector_navigation
-    uri: https://github.com/tu-darmstadt-ros-pkg/hector_navigation.git
+    uri: https://github.com/DavidGillsjo/hector_navigation.git
+    version: fix_dynamic_reconf_compilation
 - git:
     local-name: slam_gmapping
     uri: https://github.com/Robotslam/slam_gmapping.git
