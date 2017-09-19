@@ -13,7 +13,7 @@
     version: 1.12.0
 - git:
     local-name: hector_navigation
-    uri: https://github.com/coroiu/hector_navigation.git
+    uri: https://github.com/tu-darmstadt-ros-pkg/hector_navigation.git
 - git:
     local-name: slam_gmapping
     uri: https://github.com/Robotslam/slam_gmapping.git
