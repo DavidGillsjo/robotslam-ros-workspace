@@ -17,7 +17,7 @@ RUN apt-get update && \
 RUN apt-get update && \
     apt-get install ros-kinetic-turtlebot ros-kinetic-turtlebot-apps \
                     ros-kinetic-turtlebot-interactions ros-kinetic-turtlebot-simulator \
-                    ros-kinetic-kobuki-ftdi ros-kinetic-frontier-exploration -y
+                    ros-kinetic-kobuki-ftdi -y
 
 # Rosbridge for server communication
 RUN apt-get update && \
