@@ -9,6 +9,7 @@ project(robotslam_data_collection)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   message_generation
+  actionlib
   rosbag
   rospy
   std_msgs

@@ -11,6 +11,8 @@ import rosbag
 import subprocess
 import signal
 from visualization_msgs.msg import MarkerArray
+import actionlib
+from move_base_msgs.msg import MoveBaseAction, MoveBaseActionGoal
 
 import rospy
 import rospkg
@@ -87,6 +89,9 @@ class DataCollector:
         self.start_srv = rospy.Service('~start', Start, self.handleStart)
         self.end_srv = rospy.Service('~end', Trigger, self.handleEnd)
 
+        #Action lib
+        self.ac_client = actionlib.SimpleActionClient('move_base_persistent', MoveBaseAction)
+
         #Publisher
         self.pub = rospy.Publisher('~status', String, queue_size=5)
 
@@ -140,22 +145,41 @@ class DataCollector:
 
         # Start nodes
         if self.mode == CollectionMode.INITIATE_EXPLORING:
-            # Exploration
-            self.launch_handle = launchPackage("robotslam_launcher",
-                                               "launch/cartographer_exploration.launch")
-            self.mode = CollectionMode.EXPLORING
+            self.startExploration()
+
         elif self.mode == CollectionMode.INITIATE_COVERAGE:
-            # Coverage
             #TODO: Implement coverage
-            self.launch_handle = launchPackage("robotslam_launcher",
-                                               "launch/cartographer_exploration.launch")
-            self.mode = CollectionMode.COVERAGE
+            self.startExploration()
         else:
             raise ValueError("Cannot start collection in mode {}".format(self.mode))
 
         if self.req.store_rosbag:
             # Start rosbag
             self.startBag(self.req.topics)
+
+    def startExploration(self):
+        self.launch_handle = launchPackage("robotslam_launcher",
+                                            "launch/cartographer_exploration.launch")
+        #Wait for cartographer
+        rospy.loginfo("-- Waiting for cartographer")
+        rospy.wait_for_service('/start_trajectory')
+
+        rospy.loginfo("-- Sending goal to persistent action lib server")
+        self.ac_client.wait_for_server()
+        mb_action = MoveBaseActionGoal()
+        mb_action.goal.target_pose.header.frame_id = "base_link"
+        mb_action.goal.target_pose.header.stamp = rospy.Time.now()
+
+        # Quaternion to zero triggers exploration
+        mb_action.goal.target_pose.pose.position.x = 1.0
+        #goal.target_pose.pose.orientation.w = 1.0
+        self.ac_client.send_goal(mb_action)
+
+        self.mode = CollectionMode.EXPLORING
+        rospy.loginfo("-- Fininshed starting")
+
+    def startCoverage(self):
+        pass
 
     def startBag(self, topics):
         if self.bag_thread != None:
@@ -187,7 +211,12 @@ class DataCollector:
         if not forced:
             self.lock.acquire()
 
+        # Stop moving
+        rospy.loginfo("---Stop movement")
+        self.ac_client.cancel_all_goals()
+
         # Store map and stuff
+        rospy.loginfo("---Store trajectory and map")
         self.saveTrajectory()
         self.saveMap()
 
