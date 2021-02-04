@@ -28,9 +28,10 @@ RUN cd /deb_files && wget https://milhouse.cloudlab.zhaw.ch/s/pY8KBeLXkPgqngr &&
 RUN apt-get update && \
     apt-get install ros-kinetic-turtlebot ros-kinetic-turtlebot-apps \
                     ros-kinetic-turtlebot-interactions ros-kinetic-turtlebot-simulator \
-                    ros-kinetic-kobuki-ftdi ros-kinetic-frontier-exploration -y
-#
-# # Rosbridge for server communication
+                    ros-kinetic-kobuki-ftdi -y
+
+# Rosbridge for server communication
+>>>>>>> 34ae72e4505a0a8d5107469d4d2c08a9c0083f0e
 RUN apt-get update && \
     apt-get install ros-kinetic-rosbridge-server -y
 
