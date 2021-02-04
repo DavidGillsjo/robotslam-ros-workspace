@@ -6,19 +6,20 @@ XAUTH=/tmp/.docker.xauth
 touch $XAUTH
 xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
 
-if [[ ${USE_NVIDIA} == 1 ]] ; then
-  DOCKER_CMD="nvidia-docker"
-  MY_DOCKER_OPT=""
+
+if [ "${USE_NVIDIA}" == 1 ] ; then
+  NVIDIA_ARGS="--gpus all"
   DOCKER_NAME="robotslam_nvidia"
 else
-  DOCKER_CMD="docker"
+  NVIDIA_ARGS=""
+  DOCKER_NAME="robotslam_intel"
   MY_DOCKER_OPT="--volume=/dev/dri:/dev/dri:rw \
               --volume=$XAUTH:$XAUTH:rw \
               --env=XAUTHORITY=${XAUTH}"
-  DOCKER_NAME="robotslam_intel"
-fi;
+fi
 
-"$DOCKER_CMD" run --rm -it ${MY_DOCKER_OPT} ${DOCKER_OPT}\
+
+docker run --rm -it ${MY_DOCKER_OPT} ${DOCKER_OPT}\
         --name=${DOCKER_NAME}\
         --volume=$XSOCK:$XSOCK:rw \
         --network=${NETWORK-bridge}\

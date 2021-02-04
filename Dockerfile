@@ -1,31 +1,43 @@
+# FROM robopaas/rosdocked-kinetic
 FROM osrf/ros:kinetic-desktop-full-xenial
+
 
 # Arguments
 ARG user=ros
 ARG uid=1000
 ARG gid=1000
 
-#Build tools and other
-RUN apt-get update && \
-    apt-get install sudo git python-wstool python-rosdep ninja-build zsh -y
+#Remove interative elements from apt-get
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Intel Graphics support
+#Build tools and other
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y sudo git python-wstool python-rosdep ninja-build wget stow
+#
+# # Intel Graphics support
 RUN apt-get update && \
     apt-get -y install libgl1-mesa-glx libgl1-mesa-dri
+#
+# RUN apt-get -y install  ros-kinetic-realsense2-camera
+#
 
-#Turtlebot packages
+COPY deb_files /deb_files
+RUN cd /deb_files && wget https://milhouse.cloudlab.zhaw.ch/s/pY8KBeLXkPgqngr && dpkg -i /deb_files/*.deb
+
+# #Turtlebot packages
 RUN apt-get update && \
     apt-get install ros-kinetic-turtlebot ros-kinetic-turtlebot-apps \
                     ros-kinetic-turtlebot-interactions ros-kinetic-turtlebot-simulator \
                     ros-kinetic-kobuki-ftdi ros-kinetic-frontier-exploration -y
-
-# Rosbridge for server communication
+#
+# # Rosbridge for server communication
 RUN apt-get update && \
     apt-get install ros-kinetic-rosbridge-server -y
 
 # Move a launch file so that gazebo can find it
 RUN cp /opt/ros/kinetic/share/turtlebot_navigation/launch/includes/gmapping/gmapping.launch.xml \
        /opt/ros/kinetic/share/turtlebot_navigation/launch/includes/
+
 
 # Clone user to container, necessary to get X server access.
 RUN export uid="${uid}" gid="${gid}" && \
@@ -37,6 +49,9 @@ RUN export uid="${uid}" gid="${gid}" && \
 # Enable access to graphics HW
 RUN adduser "${user}" video
 
+# Enable NVIDIA graphics
+ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility
+
 WORKDIR "/ros"
 
 # Add whole repository for build.
@@ -46,23 +61,24 @@ ADD "./docker/ros_entrypoint.sh" "/ros_entrypoint.sh"
 
 # Update repositories
 RUN wstool update -t src --delete-changed-uris
+
+
 RUN chown -R "${user}:${user}" "/ros"
-
 USER "${user}"
-
 # Install deb dependencies.
 RUN rosdep update && \
     rosdep install --from-paths src --ignore-src -y -r
+
+RUN ./src/cartographer/scripts/install_proto3.sh
+RUN ./src/cartographer/scripts/install_abseil.sh
+
+
 
 # Build and install.
 SHELL ["/bin/bash", "-c"]
 RUN source "/opt/ros/kinetic/setup.bash" &&\
     catkin_make_isolated --install --use-ninja
 
-#Nvidia support
-LABEL com.nvidia.volumes.needed="nvidia_driver"
-ENV PATH /usr/local/nvidia/bin:${PATH}
-ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64:${LD_LIBRARY_PATH}
 
 # Make SSH available
 EXPOSE 22
