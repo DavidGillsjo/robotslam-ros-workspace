@@ -31,7 +31,6 @@ RUN apt-get update && \
                     ros-kinetic-kobuki-ftdi -y
 
 # Rosbridge for server communication
->>>>>>> 34ae72e4505a0a8d5107469d4d2c08a9c0083f0e
 RUN apt-get update && \
     apt-get install ros-kinetic-rosbridge-server -y
 
